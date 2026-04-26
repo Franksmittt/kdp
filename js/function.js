@@ -380,8 +380,17 @@
 				$menudisesnav.removeClass("active-btn"); 
 				$(this).addClass("active-btn");
 				e.preventDefault();
-			});		
-			$menuitem.isotope({ filter: ".first" });
+			});
+			var $firstList = $(".project-item-list").first();
+			var defaultFilter = $firstList.data("defaultFilter");
+			if (defaultFilter === undefined || defaultFilter === "") {
+				defaultFilter = ".first";
+			}
+			$menuitem.isotope({ filter: defaultFilter });
+			$menudisesnav.removeClass("active-btn");
+			$menudisesnav.filter(function () {
+				return $(this).attr("data-filter") === defaultFilter;
+			}).addClass("active-btn");
 		}			
 	});
 	/* Projects Item (filtering) End */
