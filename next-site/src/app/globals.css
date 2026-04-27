@@ -1,0 +1,4 @@
+/* Theme (Bootstrap + custom.css) supplies most rules. next/font sets --font-dm-sans / --font-space. */
+body.kgp-body {
+  font-family: var(--font-dm-sans), system-ui, sans-serif;
+}

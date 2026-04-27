@@ -4,7 +4,7 @@
 	var $window = $(window); 
 	var $body = $('body'); 
 
-	/* Preloader removed (Core Web Vitals) */
+	/* Preloader removed (Next.js / Core Web Vitals) */
 
 	/* Sticky Header */	
 	if($('.active-sticky-header').length){

@@ -1,0 +1,359 @@
+import type { Metadata } from "next";
+import { BUSINESS, SITE_URL } from "./site";
+
+export type PageSlug =
+  | "home"
+  | "about"
+  | "services"
+  | "service-single"
+  | "contact"
+  | "blog"
+  | "blog-single"
+  | "projects"
+  | "project-single"
+  | "faqs"
+  | "testimonials";
+
+const PATH: Record<PageSlug, string> = {
+  home: "/",
+  about: "/about",
+  services: "/services",
+  "service-single": "/service-single",
+  contact: "/contact",
+  blog: "/blog",
+  "blog-single": "/blog-single",
+  projects: "/projects",
+  "project-single": "/project-single",
+  faqs: "/faqs",
+  testimonials: "/testimonials",
+};
+
+type PageSeo = {
+  title: string;
+  description: string;
+  keywords: string[];
+};
+
+const PAGES: Record<PageSlug, PageSeo> = {
+  home: {
+    title: "Krugersdorp Painters | Interior & Exterior Painting",
+    description:
+      "Owner-managed painting, roof restoration, waterproofing, and maintenance for Krugersdorp, the West Rand, and Gauteng. Prep-first work for body corporates, complexes, homes, and shops. WhatsApp 076 471 9933.",
+    keywords: [
+      "painters Krugersdorp",
+      "body corporate painting",
+      "roof restoration",
+      "waterproofing",
+      "West Rand painters",
+      "sectional title painting",
+    ],
+  },
+  about: {
+    title: "About Us | Krugersdorp Painters",
+    description:
+      "Meet Rico and Krugersdorp Painters: owner-managed technical maintenance, phased repaints for complexes, high-build primers, roof and damp work, and clear scopes from first visit to handover.",
+    keywords: [
+      "about Krugersdorp Painters",
+      "painting contractor West Rand",
+      "owner managed painter",
+    ],
+  },
+  services: {
+    title: "Services | Krugersdorp Painters",
+    description:
+      "Interior and exterior painting, roof restoration, heat-reflective coatings, waterproofing and damp treatment, and general maintenance—quoted with prep, access, and materials broken out so you can compare fairly.",
+    keywords: [
+      "interior painting Gauteng",
+      "exterior painting",
+      "roof coating",
+      "waterproofing contractor",
+    ],
+  },
+  "service-single": {
+    title: "Service Detail | Krugersdorp Painters",
+    description:
+      "How we deliver prep-first painting, roof, and waterproofing work on homes, commercial facades, and sectional-title schemes—with realistic phasing and tidy sites.",
+    keywords: ["painting service Krugersdorp", "technical painting quote"],
+  },
+  contact: {
+    title: "Contact | Krugersdorp Painters",
+    description:
+      "Request a painting or maintenance quote: call or WhatsApp Rico on 076 471 9933, send photos, or book a site visit. We serve Krugersdorp, the West Rand, and wider Gauteng.",
+    keywords: [
+      "painting quote Krugersdorp",
+      "WhatsApp painter",
+      "contact painters West Rand",
+    ],
+  },
+  blog: {
+    title: "Blog | Krugersdorp Painters",
+    description:
+      "Practical notes on prep, sheen and colour for Highveld sun, phased sectional-title repaints, and keeping exterior coatings out of trouble.",
+    keywords: ["painting tips", "prep before paint", "body corporate repaint"],
+  },
+  "blog-single": {
+    title: "Article | Krugersdorp Painters Blog",
+    description:
+      "In-depth guidance from Krugersdorp Painters on prep, products, and scheduling paint work in Gauteng.",
+    keywords: ["painting blog", "Krugersdorp painters"],
+  },
+  projects: {
+    title: "Projects | Krugersdorp Painters",
+    description:
+      "Selected interiors, exteriors, body-corporate batches, and roof coatings across the West Rand—each scoped on prep, access, and the coating system we actually applied on site.",
+    keywords: [
+      "painting projects Krugersdorp",
+      "complex painting portfolio",
+      "roof painting examples",
+    ],
+  },
+  "project-single": {
+    title: "Project | Krugersdorp Painters",
+    description:
+      "Project breakdown: surfaces, prep, primers, and topcoats used on this Krugersdorp Painters job.",
+    keywords: ["painting project case study", "West Rand painting"],
+  },
+  faqs: {
+    title: "FAQs | Krugersdorp Painters",
+    description:
+      "Straight answers on interior and exterior painting, body corporate phasing, how we estimate jobs, crack and damp prep, and which coatings we specify for Gauteng weather.",
+    keywords: [
+      "painting FAQ",
+      "body corporate painting questions",
+      "paint quote explained",
+    ],
+  },
+  testimonials: {
+    title: "Testimonials | Krugersdorp Painters",
+    description:
+      "What homeowners, trustees, and tenants say about prep quality, communication, and handovers after Krugersdorp Painters completed their work.",
+    keywords: ["painter reviews Krugersdorp", "painting contractor testimonials"],
+  },
+};
+
+function absoluteUrl(path: string) {
+  return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
+}
+
+export function buildMetadata(slug: PageSlug): Metadata {
+  const p = PAGES[slug];
+  const path = PATH[slug];
+  const url = absoluteUrl(path);
+
+  return {
+    title: p.title,
+    description: p.description,
+    keywords: p.keywords,
+    authors: [{ name: BUSINESS.name }],
+    creator: BUSINESS.name,
+    publisher: BUSINESS.name,
+    metadataBase: new URL(SITE_URL),
+    alternates: { canonical: url },
+    openGraph: {
+      type: slug === "blog-single" ? "article" : "website",
+      locale: "en_ZA",
+      url,
+      siteName: BUSINESS.name,
+      title: p.title,
+      description: p.description,
+      images: [
+        {
+          url: absoluteUrl("/images/hero-info-image-1.jpg"),
+          width: 1200,
+          height: 800,
+          alt: `${BUSINESS.name} painting project`,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: p.title,
+      description: p.description,
+      images: [absoluteUrl("/images/hero-info-image-1.jpg")],
+    },
+    robots: { index: true, follow: true },
+    formatDetection: { telephone: true },
+  };
+}
+
+function organizationJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "HomeAndConstructionBusiness",
+    "@id": `${SITE_URL}/#business`,
+    name: BUSINESS.name,
+    url: SITE_URL,
+    image: absoluteUrl("/images/hero-info-image-1.jpg"),
+    telephone: BUSINESS.phone,
+    email: BUSINESS.email,
+    priceRange: "$$",
+    address: {
+      "@type": "PostalAddress",
+      addressLocality: "Krugersdorp",
+      addressRegion: "Gauteng",
+      addressCountry: "ZA",
+    },
+    areaServed: BUSINESS.areaServed.map((name) => ({
+      "@type": "AdministrativeArea",
+      name,
+    })),
+    sameAs: [BUSINESS.whatsapp],
+    description: PAGES.home.description,
+  };
+}
+
+function websiteJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "@id": `${SITE_URL}/#website`,
+    url: SITE_URL,
+    name: BUSINESS.name,
+    publisher: { "@id": `${SITE_URL}/#business` },
+    inLanguage: "en-ZA",
+  };
+}
+
+function webPageJsonLd(slug: PageSlug) {
+  const p = PAGES[slug];
+  const path = PATH[slug];
+  return {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "@id": `${absoluteUrl(path)}#webpage`,
+    url: absoluteUrl(path),
+    name: p.title,
+    description: p.description,
+    isPartOf: { "@id": `${SITE_URL}/#website` },
+    about: { "@id": `${SITE_URL}/#business` },
+    inLanguage: "en-ZA",
+  };
+}
+
+const BREADCRUMB_LABEL: Record<PageSlug, string> = {
+  home: "Home",
+  about: "About Us",
+  services: "Services",
+  "service-single": "Service detail",
+  contact: "Contact",
+  blog: "Blog",
+  "blog-single": "Article",
+  projects: "Projects",
+  "project-single": "Project",
+  faqs: "FAQs",
+  testimonials: "Testimonials",
+};
+
+function breadcrumbJsonLd(slug: PageSlug) {
+  if (slug === "home") return null;
+  const path = PATH[slug];
+  const crumbs = [
+    { name: "Home", item: SITE_URL },
+    { name: BREADCRUMB_LABEL[slug], item: absoluteUrl(path) },
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: crumbs.map((c, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name: c.name,
+      item: c.item,
+    })),
+  };
+}
+
+function contactJsonLd() {
+  return {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "@id": `${absoluteUrl("/contact")}#contactpage`,
+    url: absoluteUrl("/contact"),
+    name: PAGES.contact.title,
+    description: PAGES.contact.description,
+    mainEntity: { "@id": `${SITE_URL}/#business` },
+  };
+}
+
+function faqJsonLd() {
+  const items = [
+    {
+      q: "Do you paint interiors and exteriors?",
+      a: "Yes. Interiors cover walls, ceilings, doors, skirtings, and built-in cupboards where quoted. Exteriors include plaster, brick, and timber trim using systems suited to sun and rain. We can schedule interior and exterior in stages if you need to stay in the property.",
+    },
+    {
+      q: "Can you work with our body corporate or managing agent?",
+      a: "Yes. We work with work orders, access arrangements, and phased areas such as stairwells, passages, and parking lines. Quotes can align with maintenance budgets and approved specifications.",
+    },
+    {
+      q: "How do you estimate the cost of a paint job?",
+      a: "We measure surfaces (or work from plans), note repairs, height access, and the coating system you want. Prep, primers, topcoats, and labour are listed separately where useful.",
+    },
+    {
+      q: "Which paints and primers do you use?",
+      a: "We use quality trade acrylics and PVA for plaster, enamel systems for doors and trims where specified, and manufacturer-approved roof or metal primers. Finishes range from matt through low-sheen to semi-gloss depending on traffic and the look you want.",
+    },
+    {
+      q: "Do you repair cracks and water marks before painting?",
+      a: "Yes, within painting scope: raking flaky lines, filling, skimming small areas, stain block where needed, and sanding. Serious structural damp must be fixed at source first—we flag that on inspection.",
+    },
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: items.map((x) => ({
+      "@type": "Question",
+      name: x.q,
+      acceptedAnswer: { "@type": "Answer", text: x.a },
+    })),
+  };
+}
+
+function servicesItemListJsonLd() {
+  const services = [
+    "Interior & exterior painting",
+    "Roof restoration",
+    "Waterproofing & damp treatment",
+    "General maintenance",
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Services",
+    itemListElement: services.map((name, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name,
+    })),
+  };
+}
+
+/** JSON-LD graphs per page (Organization + WebSite on all; extras where useful). */
+export function buildJsonLd(slug: PageSlug): Record<string, unknown>[] {
+  const base: Record<string, unknown>[] = [
+    organizationJsonLd(),
+    websiteJsonLd(),
+    webPageJsonLd(slug),
+  ];
+
+  const bc = breadcrumbJsonLd(slug);
+  if (bc) base.push(bc);
+
+  if (slug === "contact") base.push(contactJsonLd());
+  if (slug === "faqs") base.push(faqJsonLd());
+  if (slug === "services") base.push(servicesItemListJsonLd());
+  if (slug === "blog-single") {
+    base.push({
+      "@context": "https://schema.org",
+      "@type": "BlogPosting",
+      headline: PAGES["blog-single"].title,
+      description: PAGES["blog-single"].description,
+      url: absoluteUrl(PATH["blog-single"]),
+      author: { "@type": "Organization", name: BUSINESS.name },
+      publisher: { "@id": `${SITE_URL}/#business` },
+      inLanguage: "en-ZA",
+    });
+  }
+
+  return base;
+}

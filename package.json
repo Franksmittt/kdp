@@ -1,0 +1,11 @@
+{
+  "name": "kgp-monorepo",
+  "private": true,
+  "description": "Run scripts from repo root; Next.js app lives in next-site/",
+  "scripts": {
+    "dev": "npm run dev --prefix next-site",
+    "build": "npm run build --prefix next-site",
+    "start": "npm run start --prefix next-site",
+    "lint": "npm run lint --prefix next-site"
+  }
+}
