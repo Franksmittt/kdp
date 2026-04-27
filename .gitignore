@@ -15,3 +15,6 @@ Desktop.ini
 
 # Optional local tooling
 tools/
+
+# Root-level npm artifacts (app deps live under next-site/)
+node_modules/

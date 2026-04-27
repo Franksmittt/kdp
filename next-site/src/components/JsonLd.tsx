@@ -1,5 +1,9 @@
 type JsonRecord = Record<string, unknown>;
 
+function safeJsonStringify(value: unknown) {
+  return JSON.stringify(value).replace(/</g, "\\u003c");
+}
+
 export function JsonLd({ data }: { data: JsonRecord[] }) {
   return (
     <>
@@ -7,7 +11,7 @@ export function JsonLd({ data }: { data: JsonRecord[] }) {
         <script
           key={i}
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: JSON.stringify(obj) }}
+          dangerouslySetInnerHTML={{ __html: safeJsonStringify(obj) }}
         />
       ))}
     </>

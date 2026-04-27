@@ -1,5 +1,10 @@
 import type { Metadata } from "next";
-import { BUSINESS, SITE_URL } from "./site";
+import {
+  BUSINESS,
+  OPENING_HOURS_JSONLD,
+  SERVICE_GEO,
+  SITE_URL,
+} from "./site";
 
 export type PageSlug =
   | "home"
@@ -27,6 +32,81 @@ const PATH: Record<PageSlug, string> = {
   faqs: "/faqs",
   testimonials: "/testimonials",
 };
+
+/** Open Graph / Twitter default image per route (unique where it helps sharing CTR). */
+const SHARE_IMAGE: Record<
+  PageSlug,
+  { path: string; width: number; height: number; alt: string }
+> = {
+  home: {
+    path: "/images/hero-bg-image.jpg",
+    width: 1920,
+    height: 1080,
+    alt: "Krugersdorp Painters — prep-first interior and exterior painting",
+  },
+  about: {
+    path: "/images/about-us-image-1.jpg",
+    width: 1200,
+    height: 800,
+    alt: "About Krugersdorp Painters",
+  },
+  services: {
+    path: "/images/service-image-1.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Painting and maintenance services",
+  },
+  "service-single": {
+    path: "/images/service-image-2.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Service detail — Krugersdorp Painters",
+  },
+  contact: {
+    path: "/images/hero-info-image-1.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Contact Krugersdorp Painters for a quote",
+  },
+  blog: {
+    path: "/images/post-1.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Painting tips and articles",
+  },
+  "blog-single": {
+    path: "/images/post-2.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Krugersdorp Painters blog article",
+  },
+  projects: {
+    path: "/images/project-image-1.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Recent painting projects",
+  },
+  "project-single": {
+    path: "/images/project-image-2.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Project case study",
+  },
+  faqs: {
+    path: "/images/what-we-do-image.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Frequently asked questions about painting",
+  },
+  testimonials: {
+    path: "/images/cta-box-image.jpg",
+    width: 1200,
+    height: 800,
+    alt: "Client testimonials",
+  },
+};
+
+const BLOG_POSTING_ISO_DATE = "2026-03-15";
 
 type PageSeo = {
   title: string;
@@ -135,18 +215,33 @@ function absoluteUrl(path: string) {
   return `${SITE_URL}${path.startsWith("/") ? path : `/${path}`}`;
 }
 
+function sameAsUrls(): string[] {
+  const extra = process.env.NEXT_PUBLIC_BUSINESS_FACEBOOK_URL?.trim();
+  return [BUSINESS.whatsapp, ...(extra ? [extra] : [])];
+}
+
+function twitterMetadata(): Partial<NonNullable<Metadata["twitter"]>> {
+  const handle = process.env.NEXT_PUBLIC_TWITTER_HANDLE?.trim();
+  if (!handle) return {};
+  const h = handle.startsWith("@") ? handle : `@${handle}`;
+  return { site: h, creator: h };
+}
+
 export function buildMetadata(slug: PageSlug): Metadata {
   const p = PAGES[slug];
   const path = PATH[slug];
   const url = absoluteUrl(path);
+  const share = SHARE_IMAGE[slug];
+  const ogImageUrl = absoluteUrl(share.path);
 
   return {
     title: p.title,
     description: p.description,
     keywords: p.keywords,
-    authors: [{ name: BUSINESS.name }],
+    authors: [{ name: BUSINESS.name, url: SITE_URL }],
     creator: BUSINESS.name,
     publisher: BUSINESS.name,
+    category: "Home improvement",
     metadataBase: new URL(SITE_URL),
     alternates: { canonical: url },
     openGraph: {
@@ -158,10 +253,10 @@ export function buildMetadata(slug: PageSlug): Metadata {
       description: p.description,
       images: [
         {
-          url: absoluteUrl("/images/hero-info-image-1.jpg"),
-          width: 1200,
-          height: 800,
-          alt: `${BUSINESS.name} painting project`,
+          url: ogImageUrl,
+          width: share.width,
+          height: share.height,
+          alt: share.alt,
         },
       ],
     },
@@ -169,21 +264,43 @@ export function buildMetadata(slug: PageSlug): Metadata {
       card: "summary_large_image",
       title: p.title,
       description: p.description,
-      images: [absoluteUrl("/images/hero-info-image-1.jpg")],
+      images: [ogImageUrl],
+      ...twitterMetadata(),
     },
-    robots: { index: true, follow: true },
-    formatDetection: { telephone: true },
+    robots: {
+      index: true,
+      follow: true,
+      googleBot: {
+        index: true,
+        follow: true,
+        "max-image-preview": "large",
+        "max-snippet": -1,
+        "max-video-preview": -1,
+      },
+    },
+    formatDetection: { telephone: true, email: true, address: true },
   };
 }
 
 function organizationJsonLd() {
   return {
     "@context": "https://schema.org",
-    "@type": "HomeAndConstructionBusiness",
+    "@type": ["HomeAndConstructionBusiness", "ProfessionalService"],
     "@id": `${SITE_URL}/#business`,
     name: BUSINESS.name,
+    alternateName: BUSINESS.legalName,
+    slogan: BUSINESS.slogan,
     url: SITE_URL,
-    image: absoluteUrl("/images/hero-info-image-1.jpg"),
+    logo: {
+      "@type": "ImageObject",
+      url: absoluteUrl("/images/hero-info-image-1.jpg"),
+      width: 1200,
+      height: 800,
+    },
+    image: [
+      absoluteUrl("/images/hero-info-image-1.jpg"),
+      absoluteUrl("/images/hero-bg-image.jpg"),
+    ],
     telephone: BUSINESS.phone,
     email: BUSINESS.email,
     priceRange: "$$",
@@ -193,11 +310,17 @@ function organizationJsonLd() {
       addressRegion: "Gauteng",
       addressCountry: "ZA",
     },
+    geo: {
+      "@type": "GeoCoordinates",
+      latitude: SERVICE_GEO.latitude,
+      longitude: SERVICE_GEO.longitude,
+    },
+    openingHoursSpecification: [...OPENING_HOURS_JSONLD],
     areaServed: BUSINESS.areaServed.map((name) => ({
       "@type": "AdministrativeArea",
       name,
     })),
-    sameAs: [BUSINESS.whatsapp],
+    sameAs: sameAsUrls(),
     description: PAGES.home.description,
   };
 }
@@ -209,6 +332,7 @@ function websiteJsonLd() {
     "@id": `${SITE_URL}/#website`,
     url: SITE_URL,
     name: BUSINESS.name,
+    description: PAGES.home.description,
     publisher: { "@id": `${SITE_URL}/#business` },
     inLanguage: "en-ZA",
   };
@@ -328,6 +452,25 @@ function servicesItemListJsonLd() {
   };
 }
 
+function projectsItemListJsonLd() {
+  const projects = [
+    "Interior repaints",
+    "Exterior & complex batches",
+    "Roof coatings",
+    "Waterproofing & damp",
+  ];
+  return {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    name: "Project types",
+    itemListElement: projects.map((name, i) => ({
+      "@type": "ListItem",
+      position: i + 1,
+      name,
+    })),
+  };
+}
+
 /** JSON-LD graphs per page (Organization + WebSite on all; extras where useful). */
 export function buildJsonLd(slug: PageSlug): Record<string, unknown>[] {
   const base: Record<string, unknown>[] = [
@@ -342,16 +485,22 @@ export function buildJsonLd(slug: PageSlug): Record<string, unknown>[] {
   if (slug === "contact") base.push(contactJsonLd());
   if (slug === "faqs") base.push(faqJsonLd());
   if (slug === "services") base.push(servicesItemListJsonLd());
+  if (slug === "projects") base.push(projectsItemListJsonLd());
   if (slug === "blog-single") {
+    const img = absoluteUrl(SHARE_IMAGE["blog-single"].path);
     base.push({
       "@context": "https://schema.org",
       "@type": "BlogPosting",
       headline: PAGES["blog-single"].title,
       description: PAGES["blog-single"].description,
       url: absoluteUrl(PATH["blog-single"]),
+      datePublished: BLOG_POSTING_ISO_DATE,
+      dateModified: BLOG_POSTING_ISO_DATE,
+      image: [img],
       author: { "@type": "Organization", name: BUSINESS.name },
       publisher: { "@id": `${SITE_URL}/#business` },
       inLanguage: "en-ZA",
+      mainEntityOfPage: { "@type": "WebPage", "@id": `${absoluteUrl(PATH["blog-single"])}#webpage` },
     });
   }
 

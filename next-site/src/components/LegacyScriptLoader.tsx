@@ -9,12 +9,12 @@ const CRITICAL_SCRIPTS = [
   "/js/validator.min.js",
   "/js/jquery.slicknav.js",
   "/js/swiper-bundle.min.js",
-  "/js/jquery.waypoints.min.js",
-  "/js/jquery.counterup.min.js",
 ] as const;
 
-/** Deferred until after first paint (idle) — keeps TBT/Lighthouse happier */
+/** Deferred until after first paint (idle) — counters, animations, isotope, main init */
 const DEFERRED_SCRIPTS = [
+  "/js/jquery.waypoints.min.js",
+  "/js/jquery.counterup.min.js",
   "/js/isotope.min.js",
   "/js/jquery.magnific-popup.min.js",
   "/js/SmoothScroll.js",

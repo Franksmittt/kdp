@@ -1,4 +1,60 @@
 /* Theme (Bootstrap + custom.css) supplies most rules. next/font sets --font-dm-sans / --font-space. */
 body.kgp-body {
   font-family: var(--font-dm-sans), system-ui, sans-serif;
+  /* Wire theme accent to self-hosted Space Grotesk from next/font */
+  --accent-font: var(--font-space), "Space Grotesk", system-ui, sans-serif;
+}
+
+/* Skip link: keyboard / screen-reader first stop */
+.kgp-skip-link {
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 100000;
+  padding: 0.75rem 1.25rem;
+  margin: 0.5rem;
+  background: #1e3a5f;
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+  border-radius: 0.25rem;
+  clip-path: inset(50%);
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.kgp-skip-link:focus {
+  clip-path: none;
+  width: auto;
+  height: auto;
+  outline: 3px solid #f4b400;
+  outline-offset: 2px;
+}
+
+#main-content:focus {
+  outline: none;
+}
+
+/* Respect reduced motion (Lighthouse / a11y) */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Stronger focus visibility for keyboard users (does not remove theme focus on components) */
+.kgp-body :where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 3px solid #1e6b8c;
+  outline-offset: 2px;
 }

@@ -23,6 +23,28 @@ function stripWhatsappFloat(html: string) {
 }
 
 /** Map legacy .html links to App Router paths */
+/** Hero carousel used multiple <h1>; keep one primary H1 for SEO and a11y. */
+function demoteDuplicateHeroHeadings(html: string, filename: string) {
+  if (filename !== "index.html") return html;
+  return html
+    .replace(
+      /<h1 class="text-anime-style-3" data-cursor="-opaque">Common areas done in phases<\/h1>/,
+      '<h2 class="text-anime-style-3" data-cursor="-opaque">Common areas done in phases</h2>',
+    )
+    .replace(
+      /<h1 class="text-anime-style-3" data-cursor="-opaque">Technical work, not quick cover-ups<\/h1>/,
+      '<h2 class="text-anime-style-3" data-cursor="-opaque">Technical work, not quick cover-ups</h2>',
+    );
+}
+
+/** Default lazy-loading for images (LCP on home is CSS hero background, not <img>). */
+function addLazyLoadingToImages(html: string) {
+  return html.replace(
+    /<img(?![^>]*\bloading=)(\s[^>]*?)(\/?>)/gi,
+    "<img loading=\"lazy\" decoding=\"async\"$1$2",
+  );
+}
+
 function rewriteLegacyLinks(html: string) {
   let s = html;
   const pairs: [RegExp, string][] = [
@@ -67,6 +89,8 @@ export const loadHtmlBody = cache((filename: string) => {
   inner = stripScripts(inner);
   inner = stripWhatsappFloat(inner);
   inner = rewriteLegacyLinks(inner);
+  inner = demoteDuplicateHeroHeadings(inner, filename);
+  inner = addLazyLoadingToImages(inner);
   return inner;
 });
 
