@@ -41,6 +41,23 @@
 		});
 	}
 
+	/* Home hero (3 slides) */
+	if ($('.hero-home-swiper').length) {
+		new Swiper('.hero-home-swiper', {
+			slidesPerView: 1,
+			speed: 700,
+			loop: true,
+			autoplay: {
+				delay: 6500,
+				disableOnInteraction: false
+			},
+			pagination: {
+				el: '.hero-home-pagination',
+				clickable: true
+			}
+		});
+	}
+
 	/* testimonial Slider JS */
 	if ($('.testimonial-slider').length) {
 		const testimonial_slider = new Swiper('.testimonial-slider .swiper', {
