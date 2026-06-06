@@ -1,0 +1,63 @@
+// Krugersdorp Painters — back-office job card & estimation telemetry
+// Run: npx prisma generate && npx prisma db push (requires DATABASE_URL)
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model JobCard {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  status    String   @default("lead")
+
+  clientName   String
+  clientEmail  String
+  clientPhone  String
+  organisation String?
+  estateSlug   String
+  suburb       String
+
+  mrrpStatus       String
+  pmr22PhaseMonths Int
+  selectedTier     String
+
+  /// JSON: EstimationInput
+  estimationInputJson  String
+  /// JSON: EstimationResult
+  estimationResultJson String
+
+  /// JSON arrays — MaterialTelemetry[], LaborTelemetry[], WeatherLogEntry[], ChangeOrder[]
+  materialTelemetryJson String @default("[]")
+  laborTelemetryJson    String @default("[]")
+  weatherLogsJson       String @default("[]")
+  changeOrdersJson      String @default("[]")
+
+  qaMoistureJson String?
+  qaDftJson      String?
+}
+
+model EstimatorLead {
+  id        String   @id @default(cuid())
+  createdAt DateTime @default(now())
+
+  name         String
+  email        String
+  phone        String
+  organisation String?
+
+  estateSlug  String
+  scale       String
+  substrate   String
+  painPoints  String
+  mrrpStatus  String
+
+  estimationResultJson String
+  selectedTier           String
+  jobCardId              String?
+}

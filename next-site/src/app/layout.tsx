@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
-import { DeferredStyles } from "@/components/DeferredStyles";
-import { LegacyScriptLoader } from "@/components/LegacyScriptLoader";
+import { SiteFooter } from "@/components/layout/SiteFooter";
+import { LeadAssessmentShell } from "@/components/b2b/LeadAssessmentShell";
 import { BUSINESS, SITE_URL } from "@/config/site";
 
 const dmSans = DM_Sans({
@@ -35,9 +35,9 @@ if (bingSiteVerification) {
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   applicationName: BUSINESS.name,
-  title: `${BUSINESS.name} | Interior & Exterior Painting`,
+  title: `${BUSINESS.name} | Exterior & Body Corporate Painting`,
   description:
-    "Owner-managed painting, roof restoration, waterproofing, and maintenance for Krugersdorp, the West Rand, and Gauteng.",
+    "Exterior-only painting for West Rand estates and body corporates. STSMA-aware phased programmes, measured material QA, and zero interior disruption.",
   robots: { index: true, follow: true },
   referrer: "origin-when-cross-origin",
   icons: {
@@ -80,7 +80,6 @@ export default function RootLayout({
       <head>
         <link rel="dns-prefetch" href="https://wa.me" />
         <link href="/css/bootstrap.min.css" rel="stylesheet" />
-        <link href="/css/slicknav.min.css" rel="stylesheet" />
         <link href="/css/swiper-bundle.min.css" rel="stylesheet" />
         <link href="/css/all.min.css" rel="stylesheet" />
         <link href="/css/custom.css" rel="stylesheet" />
@@ -92,21 +91,22 @@ export default function RootLayout({
         <a className="kgp-skip-link" href="#main-content">
           Skip to main content
         </a>
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <a
-          href="https://wa.me/27764719933"
-          className="whatsapp-float"
-          target="_blank"
-          rel="noopener noreferrer"
-          title="WhatsApp Rico"
-          aria-label="WhatsApp Rico on 076 471 9933"
-        >
-          <i className="fa-brands fa-whatsapp" aria-hidden="true" />
-        </a>
-        <DeferredStyles />
-        <LegacyScriptLoader />
+        <LeadAssessmentShell>
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+          <SiteFooter />
+          <a
+            href={BUSINESS.whatsapp}
+            className="whatsapp-float"
+            target="_blank"
+            rel="noopener noreferrer"
+            title="WhatsApp Rico"
+            aria-label={`WhatsApp Rico on ${BUSINESS.phoneDisplay}`}
+          >
+            <i className="fa-brands fa-whatsapp" aria-hidden="true" />
+          </a>
+        </LeadAssessmentShell>
       </body>
     </html>
   );

@@ -116,16 +116,16 @@ type PageSeo = {
 
 const PAGES: Record<PageSlug, PageSeo> = {
   home: {
-    title: "Krugersdorp Painters | Interior & Exterior Painting",
+    title: "Exterior Painters Krugersdorp | Body Corporate & Estate Specialists",
     description:
-      "Owner-managed painting, roof restoration, waterproofing, and maintenance for Krugersdorp, the West Rand, and Gauteng. Prep-first work for body corporates, complexes, homes, and shops. WhatsApp 076 471 9933.",
+      "Exterior-only painting for West Rand estates and body corporates. STSMA-aware phased programmes, measured material QA — zero interior disruption. Krugersdorp, Featherbrooke, Avianto, Chancliff.",
     keywords: [
-      "painters Krugersdorp",
-      "body corporate painting",
-      "roof restoration",
-      "waterproofing",
-      "West Rand painters",
-      "sectional title painting",
+      "exterior painters Krugersdorp",
+      "body corporate painting West Rand",
+      "complex painting contractors",
+      "sectional title repainting",
+      "estate boundary wall painters",
+      "PMR 22 maintenance painting",
     ],
   },
   about: {

@@ -1,0 +1,372 @@
+﻿Blueprint Architecture and Mathematical Engine for Visual Mobile-First Quoting Systems in Construction
+The construction estimating and quantity surveying sectors have historically been constrained by manual takeoffs, fragmented spreadsheets, and highly complex desktop-bound software systems. The contemporary demand for rapid, on-site, mobile-first estimation engines necessitates a fundamental paradigm shift in enterprise system architecture. This report delineates the exhaustive technical blueprint, architectural geometry, algorithmic logic, and system schemas required to engineer a "Visual Mobile-First Quoting Engine" specifically designed for exterior complex painting and roof waterproofing.
+The primary operational objective of this system is to map an architecture where extreme simplicity on the frontend is seamlessly powered by heavy computational geometry and algorithmic mathematics on the backend. By visually building a single base unit—comprising a floorplan, a multi-material facade, and a defined roof structure—toggling specific service parameters, and multiplying the output across a complex of identical units, the system must instantaneously generate mathematically exact material yields, labor allocations, and commercial cost outputs. This document provides a definitive, expert-level breakdown across four primary vectors: Mobile Visual Builder and UI Libraries, Architectural Geometry and Roof Mathematics, Dynamic Material and Labor Engines, and the Mirrored Unit Multiplier System Schema.
+Mobile Visual Builder and UI Libraries
+The user interface of a mobile-first quoting engine must conceal extreme mathematical complexity behind fluid, intuitive touch gestures. The rendering layer requires a framework capable of handling rapid state changes, multi-touch events, and complex polygonal mathematics without degrading rendering frame rates on lower-tier mobile hardware.
+Evaluating Canvas Frameworks and Rendering Topologies
+The selection of a frontend rendering framework dictates the performance ceiling of the visual builder. DOM-based rendering approaches, such as React Flow, while straightforward for simple interfaces, experience severe performance degradation when manipulating hundreds of structural nodes, particularly on mobile devices.1 When DOM elements are used to represent complex vector drawings, the browser's layout engine is forced to recalculate reflows continuously, crippling battery life and frame rates.
+Consequently, HTML5 Canvas-based rendering is required. Canvas provides a pixel-level drawing surface in the browser utilizing immediate mode rendering, clearing and redrawing the frame using JavaScript commands.1 This architecture maintains near-constant performance when rendering thousands of geometric objects. However, raw Canvas APIs lack built-in interactivity, meaning drawn shapes do not exist as queryable objects in the DOM.1
+An analysis of leading Canvas abstraction libraries highlights the fundamental differences between fabric.js and react-konva. The fabric.js library is a powerful open-source JavaScript canvas library providing an interactive object model, complex SVG path handling, and robust serialization natively.2 It is highly effective for detailed drafting applications and supports robust object grouping and viewport transformations.2 However, react-konva emerges as the superior architectural choice for a modern Next.js and React stack. react-konva integrates seamlessly with React's declarative JSX model, mapping Canvas shapes directly to React components, and natively delegating application state management to React or external performance stores like Zustand.5 By intelligently separating static architectural elements and interactive UI content across different Canvas layers, react-konva maintains a strict 60 frames per second on mobile devices during complex drag-and-drop operations.1
+Implementing 2D Floorplan Sketching and Touch Interactions
+In the primary 2D drafting phase, the mobile user sketches the footprint (Length    Width) of the building. The system architecture relies on an array of coordinate nodes stored in a global state manager, updating in real-time as the user interacts with the react-konva <Stage> component.7
+To enable responsive design on varied mobile devices, the <Stage> must calculate the device's viewport utilizing window.innerWidth and dynamically adjust its rendering scale.9 Crucially, the system must support pinch-to-zoom and multi-touch panning to allow contractors to navigate large floorplans on small screens. This is achieved by binding to the touchmove event and evaluating the Euclidean distance between two simultaneous touch points located within the e.evt.touches array.11
+The pinch-zoom mathematical algorithm requires capturing the initial touch points, finding the midpoint to serve as the scaling origin, and adjusting the scale property of the react-konva Stage based on the delta of the touch distance.13
+
+
+Zoom Calculation Step
+	Mathematical Operation / Logic
+	Calculate Midpoint (Origin)
+	  
+,    13
+	Calculate Distance Delta
+	  
+ 13
+	Derive New Scale
+	  
+
+	Reposition Stage
+	  
+ 13
+	To prevent execution conflicts between dragging a specific wall node and panning the entire canvas, event propagation must be strictly controlled. The architecture requires a state flag (e.g., isZooming) that immediately triggers stage.stopDrag() if a multi-touch gesture is registered during a node manipulation.14
+Furthermore, strict wall snapping algorithms must be implemented to ensure the geometry mathematically closes, creating a valid polygon for area calculation. As a user drags a node to form a wall segment, the application calculates the distance to all other existing nodes. If the proximity falls below a defined pixel threshold, the active node's coordinates snap directly to the target node's coordinates, ensuring perfect geometric continuity.15
+Polygon Offsetting for Wall Thickness
+A user sketching a single line sequence on a mobile device merely generates the theoretical centerline of a wall. To generate true architectural geometry, these singular lines must be inflated into closed polygons representing the physical wall thickness (e.g., 220mm for a double-brick exterior wall). This operation is executed utilizing complex polygon offsetting algorithms.
+While geospatial libraries such as Turf.js provide a turf.buffer() function to inflate geometric inputs 16, Turf.js is primarily optimized for macro-level geographic data and often introduces vertex artifacts when processing complex, self-intersecting concave corners at the micro-architectural scale.18 A vastly superior, numerically robust solution within the JavaScript ecosystem is clipper-lib (based on Angus Johnson's Clipper library). This library performs highly precise line and polygon offsetting utilizing specific join algorithms—Miter, Square, or Round—and guarantees closure without self-intersection artifacts.19 Due to JavaScript's integer limitations, the standard 128-bit clipping operations are processed at 106-bit precision, which remains mathematically flawless for sub-millimeter architectural modeling.22 Passing the raw 2D floorplan coordinate arrays through the Clipper offset function dynamically generates the exact exterior and interior wall bounding vectors required for immediate 3D extrusion.
+Transitioning from 2D Geometry to 3D Topologies
+While the 2D plan successfully captures the footprint layout, the user must visualize the property in a three-dimensional space to comprehend the facade distribution and roof structure intuitively. react-three-fiber, a powerful React renderer for the Three.js WebGL engine, serves as the optimal bridge between the 2D layout and the 3D visualization canvas.23
+The architectural lines defined in the 2D builder, once offset by the Clipper library, are mapped into a THREE.Shape() object. This object is subsequently passed into a THREE.ExtrudeGeometry function, which drives the 2D shape along the Z-axis to represent the specified physical wall height.25
+A critical engineering challenge in programmatic 3D architecture is cutting specific holes into these extruded shapes to represent the windows and doors dropped by the user during the 2D phase. Native ExtrudeGeometry frequently encounters severe triangulation failures, rendering artifacts, and topology breaks when dealing with complex, nested, or multiple holes within a single extruded shape.28 Utilizing the native shape.holes.push() method often results in broken normals and flipped faces.30
+To ensure mathematical and visual stability, the system architecture must reject native hole-punching and instead utilize Constructive Solid Geometry (CSG) libraries, specifically leveraging implementations like three-bvh-csg integrated seamlessly with react-three-fiber.31 The rendering pipeline generates the solid wall mesh in its entirety, subsequently generates intersecting bounding box meshes corresponding to the dimensions and locations of the windows, and executes a real-time boolean subtraction operation on the GPU. This flawlessly carves out the exact apertures without compromising the primary geometry's triangulation structure.
+The "Slider UI" for Dynamic Facade Finishes
+A mobile-first quoting application demands extreme UX simplicity over granular, tedious data entry. A major estimating bottleneck is accurately separating the areas of different finishes on a single wall structure (e.g., a facade that is 80% facebrick and 20% cement plaster requiring paint). To achieve this, the system deploys a highly constrained slider component.
+This UI element is implemented as a custom React slider, utilizing debounced state hooks to maintain performance. It accepts a standard float value representing the primary material coefficient (  ). As the user manipulates the thumb horizontally, the state updates. The secondary material coefficient is automatically deduced by the system as the inverse remainder:   .32
+To calculate the specific paintable surface area instantaneously, without requiring the user to physically paint specific polygons onto the 3D model, the backend logic engine algebraically applies these state coefficients to the total geometrically calculated area of the respective wall.
+  
+
+By abstracting the highly complex spatial distribution of the materials into a simple, continuous mathematical ratio, the user experience is drastically accelerated while maintaining exact estimation integrity.32
+Architectural Geometry and Roof Mathematics
+The core intelligence of the quoting engine resides in its invisible, real-time spatial mathematics. The visual inputs collected from the mobile UI must be algorithmically transformed into highly accurate square meterage (  ) and linear meterage (  ) measurements. These metrics serve as the foundational variables required to drive the downstream material and labor engines.
+Exterior Wall Surface Area Calculations
+The calculation of the exterior wall surface area requires iterative geometric processing over the vertex arrays. Because user-generated floorplans may constitute irregular, non-rectangular polygons, simple multiplication is insufficient. The gross area of the building's exterior envelope is calculated by determining the perimeter of the primary polygon and multiplying by the elevation height.
+To determine the exact perimeter length of irregular shapes, the distance formula is applied sequentially between every connected vertex (  ) in the array:
+  
+
+  
+
+  
+
+However, estimating requires the net paintable or treatable area. The system must algorithmically subtract the exact area of all windows and doors assigned to the respective wall segments.
+Metric
+	Architectural Formula
+	Description
+	Gross Envelope
+	  
+
+	Total unbroken surface area of all external walls.
+	Aperture Area
+	  
+
+	Cumulative area of all subtracted voids.
+	Net Treatable Area
+	  
+
+	The final mathematically accurate surface area requiring coatings.
+	This subtraction operation is managed via an automated looping function that queries the bounding box dimension data of all apertures linked to specific wall UUIDs within the JSON state schema.
+Roof Surface Area Mathematics
+Roof geometry represents the most complex vector of exterior estimation, highly dependent on the pitch (slope) of the structure. Traditional roofing estimations communicate pitch as a ratio indicating vertical rise over a standard 12-inch horizontal run.34 In algorithmic computational geometry, this ratio must be mathematically converted into a multiplier, known as the Roof Pitch Factor (  ). This factor dictates exactly how much larger the sloped, three-dimensional roof surface is compared to the flat, two-dimensional blueprint footprint below it.34
+The Pythagorean theorem provides the mathematical derivation for this critical multiplier. By finding the true length of the rafter for every standard unit of horizontal run, the system determines the surface area expansion.34
+  
+
+Using the standard imperial run of 12 inches, the formula becomes:    34
+For example, a common    roof pitch yields a factor of   . Alternatively, if the mobile UI captures the pitch via a degree input (  ), the multiplier algorithm simplifies to calculating the secant of the angle:
+  
+
+
+
+Roof Pitch Ratio
+	Corresponding Multiplier (Pf​)
+	Geometric Application
+	4 / 12
+	1.054
+	  
+ 36
+	5 / 12
+	1.083
+	  
+ 36
+	6 / 12
+	1.118
+	  
+ 36
+	8 / 12
+	1.202
+	  
+ 36
+	10 / 12
+	1.302
+	  
+ 36
+	Before this pitch multiplier is applied, the backend system must expand the 2D building footprint coordinates to account for the physical roof overhang (e.g., a standard 500mm or 0.5m eave). For a standard rectangular footprint, the dimensions are programmatically expanded outward 37:
+  
+
+  
+
+  
+
+The true total roof surface area is then dynamically computed:
+  
+
+This methodology remains mathematically robust regardless of whether the roof is rendered as a standard gable, a complex hip, or a flat configuration, provided the pitch ratio remains constant across all primary planes.36
+Linear Mathematics for Ridges, Valleys, and Parapets
+The waterproofing sector relies heavily on linear meters (  ) rather than square meters, specifically targeting the sealing of structural joints, ridges, valleys, and parapet walls. The backend engine mathematically derives these lengths directly from the expanded geometric footprint and the selected roof structural style.
+Standard Gable Roof
+A standard gable configuration features a singular ridge beam running along the central longitudinal axis of the structure.
+  
+
+Complex Hip Roof
+A hip roof architecture contains a central ridge and four sloping hip rafters connecting the corners to the ridge. The theoretical length of the central ridge is calculated by subtracting the total span (width) of the building from the total length, ensuring the eave overhangs are fully accounted for.39
+
+
+Hip Roof Component
+	Algorithmic Formula
+	Description
+	Ridge Length
+	  
+
+	The top horizontal peak line.39
+	Hip Run (Horizontal)
+	  
+
+	The flat diagonal run of the hip from building corner to the ridge.
+	Hip Rafter Length
+	  
+
+	The true sloped physical length of a single hip rafter.41
+	Total Hip Linear
+	  
+
+	The combined linear meterage of all four intersecting hips.
+	Intersecting Roofs and Valley Mathematics (L-Shapes)
+When a user dragging a 2D floorplan node creates an extension, forming an L-shape or T-shape blueprint, the three-dimensional intersection of the two sloped roof planes automatically generates a structural valley. If the slope ratios of both the major and minor intersecting roofs are mathematically equal, the valley rafter length is calculated identically to a hip rafter, running dynamically from the internal blueprint corner to the major ridge intersection.38
+The formula for the valley line length incorporates the theoretical run of both the major and minor planes:   .41
+Flat Concrete Roofs and Parapet Walls
+For flat concrete slab configurations, the critical linear measurement is the perimeter parapet wall. The linear meterage is derived directly from the exact perimeter of the 2D footprint, prior to any overhang expansion.
+  
+
+Waterproofing parapet structures involves complex detailing along the 90-degree internal corner where the horizontal slab intersects the vertical upstand. This interface requires the installation of specialized membrane rolls.44 Furthermore, the algorithms must factor in drainage outlets, which must be positioned at a minimum distance of 500mm from upstand elements and one meter from structural expansion joints.47
+Dynamic Material and Labor Engine
+Once the architectural geometry is successfully resolved into net surface areas and precise linear measurements, the verified data payload is passed to the Dynamic Material and Labor Engine. This algorithmic layer processes the boolean service toggles selected by the user on the mobile frontend to instantaneously calculate raw material yields, compound waste factors, and specific labor allocations.
+Algorithmic Logic for Service Toggles
+The application interface utilizes minimalist Boolean toggles (e.g., "Waterproofing: ON/OFF", "Plaster Primer: ON/OFF"). When activated, the backend engine applies highly specific, chemistry-driven industry-standard yield algorithms to the geometric datasets.
+Toggle: Waterproofing Membrane and Liquid Plastics
+Waterproofing complex roofs requires sealing the linear joints—specifically the ridges, hips, valleys, and parapet transitions—using a sophisticated combination of reinforcing stitch-bonded polyester (SBP) membrane rolls and elastomeric liquid plastic coatings.48
+SBP membrane rolls are manufactured and supplied in standard commercial lengths, typically 10m or 20m, and various defined widths, such as 100mm, 150mm, and 200mm.49 To accurately calculate the required number of physical rolls, the engine aggregates the total linear meterage of joints requiring detailing. Furthermore, the mathematical algorithm must proactively account for a standard operational overlap (typically 10% to 15%) required when joining two separate rolls together on site.
+  
+
+  
+
+  
+
+Liquid plastic polymers are subsequently applied over the SBP membrane for total saturation and ultraviolet (UV) protection. Manufacturer product specifications dictate an average coverage rate of 2.0 to 2.5 Liters per square meter (  ) for a completed multi-coat system.48 To algorithmically convert the linear joint length into a precise area for liquid volume calculation, the total linear length is multiplied by the specific width of the applied membrane chosen for the task (e.g., a 200mm roll equates to a 0.2m width).49
+  
+
+  
+
+When dealing with cold fluid-applied elastomeric membranes (such as Mapeproof or MEL-ROL), engineers calculate coverage strictly based on the Dry Film Thickness (DFT) and the product's solid content percentage.54 The formula for estimating pure liquid membrane coverage utilizes the volume solids:   .56 For non-warranted systems, a theoretical coverage rate applied at a minimum thickness of 60 mil yields approximately 25 square feet per gallon.55 The engine processes these variables to return exact pail quantities.
+Toggle: Plaster Primer Application
+When the user activates the Primer toggle, the engine targets the previously calculated total net paintable surface area (  ). Alkali-resistant plaster primer is a critical preliminary layer necessary for neutralizing chemical alkali present in new cement plaster, asbestos, and brickwork before topcoats can be applied.58
+Industry laboratory data indicates that theoretical spreading rates for high-quality water-based and solvent-based plaster primers range dynamically from 5 to 11    per liter, heavily dependent on the porosity and microscopic profile of the specific substrate.59 For algorithmic stability, the engine utilizes a reliable median average of 8    per liter.61
+  
+
+The Waste Factor is a crucial system constant (typically configured at 0.10 or 10%) implemented directly into the algorithm to financially account for unavoidable on-site spillage, roller absorption, and environmental evaporation losses.
+Toggle: Baseline Crack Filling
+Crack filling is not measured precisely by the user on the visual builder; expecting a user to manually plot individual micro-cracks on a mobile canvas is highly inefficient and detrimental to the software's user experience. Instead, the computational engine utilizes a predictive baseline volume algorithm permanently tied to the total plastered area calculation. The system utilizes historical data to assume a specific baseline, for instance, 0.05 kilograms of filler required per    of plastered wall surface.
+  
+
+The Labor Calculation Matrix
+Calculating the true commercial cost of labor requires converting geometrical outputs directly into time variables. The construction industry utilizes established empirical productivity rates to estimate the exact man-hours required for specific isolated tasks.
+For standard painting operations, an established tradesman productivity rate dictates an output of approximately 0.20 man-hours per square meter (  ) for vertical walls.63 This metric correlates to a single skilled painter completing roughly 40    in a standard 8-hour shift, or approximately 20    per day when factoring in rigorous surface preparation and scaffolding manipulation.64 The matrix must also dynamically differentiate between the application of standard acrylics (     ) and more labor-intensive enamel coatings (     ).63 Furthermore, the productivity discrepancy between skilled tradesmen (e.g., 10    per hour) and unskilled helpers (e.g., 7    per hour) heavily influences the blended crew cost rate.65
+To build the primary labor calculation matrix, the system engine first aggregates the total required theoretical man-hours across all selected services.
+
+
+Construction Task
+	Empirical Productivity Constant
+	Input Unit
+	Total Man-Hours Calculation
+	Surface Preparation & Filling
+	  
+
+	hrs/  
+	  
+
+	Primer Coat Application
+	  
+
+	hrs/  
+	  
+
+	Topcoat Painting (2 Coats)
+	  
+
+	hrs/  
+	  
+ 63
+	Membrane Detailing & Joint Sealing
+	  
+
+	hrs/  
+	  
+
+	The total accumulated theoretical man-hours (  ) represents the aggregate absolute time required for a single hypothetical worker to complete the entire scope of the project. The mobile interface provides a mechanism allowing the user to select the intended on-site crew size (e.g., 1, 2, 3, or 4 workers). The engine dynamically processes this numerical selection to output actionable "Estimated Crew Days," providing the contractor with the exact project timeline.
+  
+
+This advanced matrix algorithm ensures that if a user organically alters the crew size via a dropdown or slider interface on the frontend, the estimated project timeline and the associated per-diem labor overheads recalculate instantly, providing immediate, transparent financial visibility.
+The "Mirrored Unit" Multiplier and System Schema
+The ultimate commercial utility of the visual quoting engine lies in its ability to infinitely scale. In highly complex real estate environments, such as multi-unit residential estates, sprawling townhouses, or industrial parks, an estimator typically only measures a single representative base unit and subsequently multiplies that data across hundreds of identical units. The system architecture must perfectly and securely encapsulate the base unit's data and route it through a highly scalable backend to generate a finalized, globally aggregated commercial quote.
+The JSON Base Unit Object Schema
+When the user finalizes the visual build phase on the mobile frontend, the react-konva Canvas state, the derived 3D geometry variables, and the boolean service toggle states are serialized into a strict, validated JSON payload known within the system as the "Base Unit Object". This extensive schema acts as the singular source of truth for the backend computational algorithms.
+
+
+
+
+
+
+JSON
+{
+ "base_unit_id": "uuid-1234-5678",
+ "project_reference": "proj-estate-alpha",
+ "geometry": {
+   "footprint": {
+     "area_sqm": 120.50,
+     "perimeter_lm": 44.00,
+     "vertices": [{"x": 0, "y": 0}, {"x": 10, "y": 0}, {"x": 10, "y": 12}, {"x": 0, "y": 12}]
+   },
+   "walls": [
+     {
+       "wall_id": "wall-north-01",
+       "length_m": 10.00,
+       "height_m": 3.00,
+       "gross_area_sqm": 30.00,
+       "apertures_area_sqm": 4.50,
+       "net_area_sqm": 25.50,
+       "finishes": {
+         "facebrick_ratio": 0.00,
+         "plaster_ratio": 1.00
+       }
+     }
+   ],
+   "roof": {
+     "structural_style": "hip",
+     "pitch_degrees": 30,
+     "pitch_factor": 1.154,
+     "overhang_m": 0.50,
+     "surface_area_sqm": 145.20,
+     "linear_joints": {
+       "ridges_lm": 4.00,
+       "hips_lm": 24.60,
+       "valleys_lm": 0.00,
+       "parapets_lm": 0.00
+     }
+   }
+ },
+ "services_requested": {
+   "waterproofing_membrane": true,
+   "alkali_primer": true,
+   "crack_remediation": true,
+   "acrylic_topcoat": true
+ },
+ "labor_parameters": {
+   "allocated_crew_size": 3,
+   "standard_shift_hours": 8,
+   "blended_hourly_rate": 150.00
+ }
+}
+
+This highly structured payload ensures that absolutely no graphical rendering data (such as raw pixel coordinates, React node states, or Three.js camera angles) is unnecessarily transmitted to the backend server. The mobile frontend is strictly responsible for rendering the UI and calculating the primary geometric vectors, passing only the deterministic numerical values to the API. This decoupling ensures the payload remains microscopic, guaranteeing instantaneous network transmission even on weak mobile data connections.
+The Next.js and Python Backend Architecture
+The backend processing is handled via Next.js Route Handlers (serverless API routes) executing highly secure server-side logic. This architecture provides an isolated environment to execute the material multiplication algorithms without ever exposing markup formulas, hidden productivity constants, or sensitive vendor database pricing to the client-side browser application. In scenarios demanding exceptionally heavy geoprocessing tasks or the programmatic generation of highly complex, mathematically dense PDF reports (such as utilizing the ReportLab library), the Next.js API acts as an orchestration gateway, routing specific mathematical workloads to a dedicated Python microservice running via FastAPI.
+The Mirrored Multiplication Logic
+The Next.js API endpoint receives the validated JSON Base Unit Object (parsed via a schema validator like Zod to ensure type safety) along with a multiplier_count integer variable representing the scale (e.g., "120 identical units"). The system initializes an aggregation class that recursively iterates through the Base Unit Object.
+1. Geometric Unit Multiplication: Every raw geometric value (  ,   ,   ) is isolated in memory and multiplied strictly by the multiplier_count.
+2. Delayed Algorithm Execution: The Dynamic Material and Labor Engine algorithms (detailed in the previous vectors) are executed only using these newly aggregated total metrics. Crucially, algorithms utilizing ceiling functions, such as the equation for required membrane rolls (  ), must be executed strictly after the total linear meterage across the entire complex is multiplied. If the system rounds up the roll count of a single unit first and then multiplies that rounded integer by 120 units, it will create massive exponential material waste estimation errors. The logic demands aggregating the absolute raw lengths first, and processing the ceiling algorithm only on the final global total.
+3. Cost Database Integration: The backend synchronously queries the relational database (e.g., PostgreSQL managed via Prisma or Drizzle ORM) for the most current vendor material pricing. It retrieves the live cost per 20m roll of SBP membrane, the wholesale cost per liter of elastomeric liquid plastic, and the blended daily wage rate of the selected labor crew.
+Finalizing the Commercial Quote
+The backend engine aggregates the total verified material costs and the total labor costs to establish the absolute Base Project Cost.
+  
+
+  
+
+  
+
+To finalize the commercial quote for the end client, a dynamic profit margin must be algorithmically applied. The profit margin is applied as a mathematical markup percentage (  ) placed entirely on top of the base cost.
+  
+
+The Next.js backend meticulously formats these computational outputs into a secondary, finalized JSON response. This return payload details the line-item exact material quantities required for procurement (e.g., "Total Paint: 450 Liters", "Total SBP Membrane: 220 Meters"), the exact labor hours allocated, granular overhead distribution, and the finalized commercial price point.
+By executing this sophisticated logic securely on the server-side, the mobile application remains exceptionally lightweight. The device merely parses the returning JSON response and elegantly renders the finalized PDF quote interface. The ultimate result is an application where an estimator experiences an interface simple enough to allow them to sketch a single floorplan with their thumb, drag a slider to dictate the facade, type "120 units" into an input box, and instantly receive a mathematically flawless, multi-variable, enterprise-grade construction quote in milliseconds.
+Works cited
+   1. Best Canvas Libraries for Web & Mobile (Jan 2026) - Velt, accessed June 6, 2026, https://velt.dev/blog/best-canvas-library-for-web-and-mobile-apps
+   2. Fabric.js Javascript Library, accessed June 6, 2026, https://fabricjs.com/
+   3. Build indoor maps with Fabric.js and React - LogRocket Blog, accessed June 6, 2026, https://blog.logrocket.com/build-indoor-maps-fabric-js-react/
+   4. fabricjs · GitHub Topics, accessed June 6, 2026, https://github.com/topics/fabricjs?l=typescript&o=desc&s=
+   5. React Canvas Library — Getting Started with react-konva, accessed June 6, 2026, https://konvajs.org/docs/react/index.html
+   6. Getting Started with Konva — HTML5 Canvas 2D Framework, accessed June 6, 2026, https://konvajs.org/docs/index.html
+   7. GitHub - fedepaj/arcada-planner: Browser-based 2D floor plan editor — draw walls, place furniture, manage multiple floors, and print your plans. Built with React, Konva.js and Zustand., accessed June 6, 2026, https://github.com/fedepaj/arcada-planner
+   8. GitHub - ahmethakanbesel/floor-maker: A free, browser-based 2D floor plan creator for designing room layouts and visualizing furniture placement., accessed June 6, 2026, https://github.com/ahmethakanbesel/floor-maker
+   9. Responsive Canvas Stage Demo | Konva - JavaScript Canvas 2d Library, accessed June 6, 2026, https://konvajs.org/docs/sandbox/Responsive_Canvas.html
+   10. How to make Konva-React responsive (scaling) canvas according to device size / resolution? - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/62905313/how-to-make-konva-react-responsive-scaling-canvas-according-to-device-size-r
+   11. Multi-touch Canvas scale with pinch zoom - Konva.js, accessed June 6, 2026, https://konvajs.org/docs/sandbox/Multi-touch_Scale_Stage.html
+   12. HTML5 Canvas Mobile Touch Events Tutorial - Konva.js, accessed June 6, 2026, https://konvajs.org/docs/events/Mobile_Events.html
+   13. Konva - stage centered on pinch zoom - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/50379477/konva-stage-centered-on-pinch-zoom
+   14. React-konva mobile zoom and draggable image - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/66075989/react-konva-mobile-zoom-and-draggable-image
+   15. Newest 'konvajs' Questions - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/tagged/konvajs?tab=Newest
+   16. buffer - Turf.js, accessed June 6, 2026, https://turfjs.org/docs/api/buffer
+   17. polygon | Turf.js, accessed June 6, 2026, https://turfjs.org/docs/api/polygon
+   18. Turf.js Intersecting buffer with Polygon,MultiPolygon,GeometryCollection - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/40211522/turf-js-intersecting-buffer-with-polygon-multipolygon-geometrycollection
+   19. Javascript Clipper / Wiki / documentation - SourceForge, accessed June 6, 2026, https://sourceforge.net/p/jsclipper/wiki/documentation/
+   20. junmer/clipper-lib: Boolean operations and offsetting library in Javascript - GitHub, accessed June 6, 2026, https://github.com/junmer/clipper-lib
+   21. Clipper2 - Polygon Clipping Offsetting & Triangulating - angusj.com, accessed June 6, 2026, https://www.angusj.com/clipper2/Docs/Overview.htm
+   22. svg - Offsetting polygons in Javascript - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/13248896/offsetting-polygons-in-javascript
+   23. Geo Globe Three: Interactive 3D World Map with GeoJSON - GitHub, accessed June 6, 2026, https://github.com/NombanaMtechniix/geo-globe-three
+   24. Three.js-OpenSource-List | Next-gen Tech Edu, accessed June 6, 2026, https://ng-tech.icu/books/awesome-lists/02.frontend/10.cg/graphicslibrary/web/three.js/three.js-opensource-list/
+   25. three.js shape holes height - javascript - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/42447345/three-js-shape-holes-height
+   26. Rotating an extruded shape with "filled holes" in Three.JS - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/78436781/rotating-an-extruded-shape-with-filled-holes-in-three-js
+   27. Rotational Extrusion with React Three Fiber - Questions - three.js forum, accessed June 6, 2026, https://discourse.threejs.org/t/rotational-extrusion-with-react-three-fiber/59331
+   28. ExtrudeGeometry bevel fails with high negative bevelOffset (shape with a hole) - Questions - three.js forum, accessed June 6, 2026, https://discourse.threejs.org/t/extrudegeometry-bevel-fails-with-high-negative-beveloffset-shape-with-a-hole/26904
+   29. Extrude geometry, path holes bug · Issue #907 · mrdoob/three.js - GitHub, accessed June 6, 2026, https://github.com/mrdoob/three.js/issues/907
+   30. THREE.js: Punch hole in Shape with another Shape - Stack Overflow, accessed June 6, 2026, https://stackoverflow.com/questions/28532878/three-js-punch-hole-in-shape-with-another-shape
+   31. Is there an easy way to create a hollowed out extrusion? - Questions - three.js forum, accessed June 6, 2026, https://discourse.threejs.org/t/is-there-an-easy-way-to-create-a-hollowed-out-extrusion/61652
+   32. Breaking Down the Jelly Slider - Software Mansion, accessed June 6, 2026, https://swmansion.com/blog/breaking-down-the-jelly-slider-9ab9239f6d80/
+   33. Building a React App to Explore State-Space Modeling & Control Theory With a Spring-Mass-Damper System | by Bitwise Insights | Medium, accessed June 6, 2026, https://medium.com/@bitwise_insights/building-a-react-app-to-explore-state-space-modeling-control-theory-with-a-spring-mass-damper-a016340f8919
+   34. Your Ultimate Roof Pitch Factor Chart for Accurate Estimating | TruTec Blog, accessed June 6, 2026, https://trutec.ai/blog/roof-pitch-factor-chart
+   35. Roof Pitch Calculator - RoofSnap, accessed June 6, 2026, https://roofsnap.com/resources/roof-pitch-calculator/
+   36. Roof Slope Factors - Tamco - Thompson Architectural Metals Company, accessed June 6, 2026, https://tamcometalroof.com/resources/roof-slope-factors/
+   37. Roof Pitch Explained: The Complete Reference Guide - Rapid Rafter, accessed June 6, 2026, https://www.rapidrafter.com/learn/roof-pitch-explained
+   38. Valley Roof Calculator - Easy Rafters, accessed June 6, 2026, https://www.easyrafters.com/Roofs/Valley
+   39. Framing a Hip Roof: How To Calculate the Ridge Length on a Hip Roof - Dunn Lumber, accessed June 6, 2026, https://www.dunnlumber.com/blog/post/framing-a-hip-roof-how-to-calculate-the-ridge-length-on-a-hip-roof
+   40. How To Calculate The Length of Hip Roof Framing Ridge - Home Building Tutorial, accessed June 6, 2026, https://www.youtube.com/watch?v=byno1BCn4Ws
+   41. How do you calculate the theoretical line length of this Valley Rafter? : r/Carpentry - Reddit, accessed June 6, 2026, https://www.reddit.com/r/Carpentry/comments/1c5n9zs/how_do_you_calculate_the_theoretical_line_length/
+   42. November 2012 - Roof Framing Geometry, accessed June 6, 2026, http://sbebuilders.blogspot.com/2012/11/
+   43. Hip, Valley, & Jack Rafters, accessed June 6, 2026, https://wilswood.weebly.com/uploads/1/6/8/8/16880972/ch18_carpentry_se.pdf
+   44. Waterproofing Flat Deck & Parapet Walls - Paintcor | Paint Manufacturers | Quality Paint South Africa, accessed June 6, 2026, https://paintcorsa.co.za/waterproofing-flat-deck-parapet-walls/
+   45. WATERPROOFING NEW FLAT DECK ROOFS AND PARAPET WALLS Determining your product requirement: METHOD 1 - Paintcor, accessed June 6, 2026, https://paintcorsa.co.za/wp-content/uploads/2021/08/05-Waterproofing-Flat-Deck-Parapet-Walls.pdf
+   46. Waterproofing roof slabs and parapet walls - TAL, accessed June 6, 2026, https://tal.co.za/waterproofing-roof-slabs-and-parapet-walls
+   47. Waterproofing Roofs - SANS10400-Building Regulations South Africa, accessed June 6, 2026, https://www.sans10400.co.za/waterproofing-roofs/
+   48. Liquid Plastic - Technical Data Sheet - Flash Harry, accessed June 6, 2026, https://flashharry.co.za/sheets/52/download
+   49. FLASH HARRY MEMBRANE SBP 100MMX20M - Prinro, accessed June 6, 2026, https://prinro.co.za/product/flash-harry-membrane-sbp-100mmx20m
+   50. Flash Harry Waterproofing Membrane - OBARO Online, accessed June 6, 2026, https://shop.obaro.co.za/product/flash-harry-waterproofing-membrane/
+   51. Flash Harry - One-Shot Kit Terracotta 5L with Waterproofing Membrane Roll 200mmx10m, accessed June 6, 2026, https://buildmate.co.za/flash-harry-one-shot-kit-terracotta-5l-with-waterproofing-membrane-roll-200mmx10m.html
+   52. Flash Harry Waterproofing Membrane - 1m x 10m - Raines Africa, accessed June 6, 2026, https://raines.africa/en/product/flash-harry-waterproofing-membrane-1m-x-10m
+   53. Flash Harry SBP Waterproofing Membrane - Paint Trade, accessed June 6, 2026, https://www.painttrade.co.za/product-page/flash-harry-sbp-waterproofing-membrane
+   54. Mapeproof Liquid Membrane | Polyglass, accessed June 6, 2026, https://polyglass.us/wp-content/uploads/2022/02/Mapeproof-Liquid-Membrane-TDS-5.pdf
+   55. MEL-ROL LIQUID MEMBRANE for Flashing & Reinforcement - W. R. Meadows, accessed June 6, 2026, https://www.wrmeadows.com/mel-rol-liquid-membrane/
+   56. Waterproofing in Restoration and New Construction: A Critical Component - W. R. Meadows, accessed June 6, 2026, https://www.wrmeadows.com/blog/waterproofing-membranes-hydrostatic-pressure-astm-guide/
+   57. PROCOR® Composite Waterproofing System Data Sheet - GCP Applied Technologies, accessed June 6, 2026, https://gcpat.com/en/solutions/products/liquid-waterproofing/procor-composite-waterproofing-system-data-sheet
+   58. PLASTER PRIMER - Medal Paints, accessed June 6, 2026, https://medalpaints.co.za/plaster-primer/
+   59. Dulux Plaster Primer, accessed June 6, 2026, https://www.dulux.co.za/en/products/dulux-plaster-primer
+   60. Water Based Plaster Primer - Sparcolux, accessed June 6, 2026, https://sparcolux-paints.co.za/water-based-plaster-primer/
+   61. Plaster Primer | Water-Based Primer for New Cement & Plaster | Duram Smart Paint, accessed June 6, 2026, https://www.duram.co.za/product/plaster-primer/
+   62. Plascon Plaster Primer - Plascon South Africa, accessed June 6, 2026, https://plascon.co.za/product/plaster-primer
+   63. Painting - Production Rates, accessed June 6, 2026, https://methvin.co/production-rates/building-constants/painting/painting/
+   64. Productivity Rates in Construction Projects | PDF - Scribd, accessed June 6, 2026, https://www.scribd.com/document/677095280/Productivity-Rates-in-Construction-Projects
+   65. Cost Breakdown for Painting Projects | PDF - Scribd, accessed June 6, 2026, https://www.scribd.com/document/850054806/CCE-2
+   66. Estimating Painting Costs in Projects | PDF - Scribd, accessed June 6, 2026, https://www.scribd.com/document/846750242/Module-1-Cost-Estimate-for-Painting-Works

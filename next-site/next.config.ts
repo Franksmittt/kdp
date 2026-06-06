@@ -14,6 +14,15 @@ const securityHeaders = [
 const nextConfig: NextConfig = {
   compress: true,
   poweredByHeader: false,
+  transpilePackages: [
+    "three",
+    "react-konva",
+    "konva",
+    "clipper-lib",
+    "three-bvh-csg",
+    "@react-three/fiber",
+    "@react-three/drei",
+  ],
   images: {
     formats: ["image/avif", "image/webp"],
     deviceSizes: [640, 750, 828, 1080, 1200, 1920],
@@ -22,15 +31,6 @@ const nextConfig: NextConfig = {
   },
   async headers() {
     const staticCache = [
-      {
-        source: "/js/:path*",
-        headers: [
-          {
-            key: "Cache-Control",
-            value: "public, max-age=31536000, immutable",
-          },
-        ],
-      },
       {
         source: "/css/:path*",
         headers: [

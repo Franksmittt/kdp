@@ -43,6 +43,6 @@ export const config = {
     /*
      * Run only on likely document navigations; skip static assets and Next internals.
      */
-    "/((?!_next/|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|images/|css/|js/|.*\\.(?:ico|png|jpg|jpeg|gif|webp|svg|woff2?)$).*)",
+    "/((?!_next/|favicon\\.ico|robots\\.txt|sitemap\\.xml|manifest\\.webmanifest|images/|css/|webfonts/|.*\\.(?:ico|png|jpg|jpeg|gif|webp|svg|woff2?)$).*)",
   ],
 };
