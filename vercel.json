@@ -1,6 +1,16 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
-  "installCommand": "cd next-site && npm ci",
-  "buildCommand": "cd next-site && npm run build",
-  "outputDirectory": "next-site/.next"
+  "version": 2,
+  "builds": [
+    {
+      "src": "next-site/package.json",
+      "use": "@vercel/next"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/next-site/$1"
+    }
+  ]
 }
