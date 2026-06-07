@@ -1,10 +1,13 @@
 {
   "name": "kdp",
   "private": true,
+  "workspaces": [
+    "next-site"
+  ],
   "scripts": {
-    "dev": "npm --prefix next-site run dev",
-    "build": "npm --prefix next-site run build",
-    "start": "npm --prefix next-site run start",
-    "lint": "npm --prefix next-site run lint"
+    "dev": "npm run dev --workspace krugersdorp-painters",
+    "build": "npm run build --workspace krugersdorp-painters",
+    "start": "npm run start --workspace krugersdorp-painters",
+    "lint": "npm run lint --workspace krugersdorp-painters"
   }
 }
