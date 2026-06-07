@@ -1,7 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 
-const DEFAULT_SITE = "https://krugersdorppainting.co.za";
+const DEFAULT_SITE = "https://www.krugersdorppainting.co.za";
 
 function apexHost(hostname: string) {
   return hostname.replace(/^www\./i, "");

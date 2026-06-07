@@ -4,7 +4,7 @@
  */
 export const SITE_URL =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ??
-  "https://krugersdorppainting.co.za";
+  "https://www.krugersdorppainting.co.za";
 
 /** Approximate service-area centroid (Krugersdorp); used for LocalBusiness geo. */
 export const SERVICE_GEO = {
