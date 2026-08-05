@@ -22,20 +22,28 @@ export function HeroHome() {
           Exterior painting for West Rand estates
         </h1>
         <p className="kgp-hero__lead kgp-hero__lead--on-dark">
-          Roofs, facades, and boundary walls for body corporates and complexes —
-          without disturbing residents inside.
+          Peeling facades and faded walls drag the whole scheme down. We repaint
+          roofs, facades, and boundary walls for body corporates and complexes —
+          prepped properly, phased around residents, owner-managed from site
+          visit to handover.
         </p>
         <div className="kgp-hero__actions">
           <LeadAssessmentTrigger variant="primary" className="kgp-lp-btn">
             Request a site visit
           </LeadAssessmentTrigger>
-          <a href={`tel:${BUSINESS.phone}`} className="kgp-lp-btn kgp-lp-btn--ghost">
-            Call {BUSINESS.phoneDisplay}
+          <a
+            href={BUSINESS.whatsapp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="kgp-lp-btn kgp-lp-btn--ghost"
+          >
+            <i className="fa-brands fa-whatsapp" aria-hidden="true" />
+            WhatsApp Rico
           </a>
         </div>
         <ul className="kgp-hero__meta">
-          <li>Estates &amp; complexes</li>
-          <li>West Rand focus</li>
+          <li>Same-day response</li>
+          <li>Exterior only — no interiors</li>
           <li>Owner-managed</li>
         </ul>
       </div>

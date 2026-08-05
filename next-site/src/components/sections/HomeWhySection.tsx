@@ -1,21 +1,15 @@
-import Link from "next/link";
-
-const REASONS = [
+const PILLARS = [
   {
     title: "Exterior specialists",
-    text: "Estates and complexes only — roofs, facades, boundary walls.",
+    text: "Estates and complexes only — roofs, facades, boundary walls. We don't do interiors, so we're very good at what we do.",
   },
   {
     title: "Owner-managed",
-    text: "Rico runs the job from first site visit through handover.",
+    text: "Rico runs every job personally. The person who quoted your scheme is the person on site — not a call centre.",
   },
   {
-    title: "Clear scopes",
-    text: "Written quotes trustees and managing agents can work with.",
-  },
-  {
-    title: "West Rand focus",
-    text: "Local teams for Krugersdorp estates and surrounding complexes.",
+    title: "Estate-ready process",
+    text: "Written scopes, agreed working hours, security compliance, and phasing that works around residents and levies.",
   },
 ] as const;
 
@@ -29,7 +23,7 @@ export function HomeWhySection() {
         </header>
 
         <ul className="kgp-lp-why__grid">
-          {REASONS.map((item, index) => (
+          {PILLARS.map((item, index) => (
             <li key={item.title}>
               <span className="kgp-lp-why__num">0{index + 1}</span>
               <h3>{item.title}</h3>
@@ -38,10 +32,15 @@ export function HomeWhySection() {
           ))}
         </ul>
 
-        <Link href="/about" className="kgp-lp-text-link">
-          About the team
-          <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-        </Link>
+        <div className="kgp-lp-honest">
+          <p className="kgp-lp-honest__label">The honest part</p>
+          <p className="kgp-lp-honest__text">
+            We&apos;re rarely the cheapest quote on the table. Proper prep and
+            the right coatings cost more upfront — and years less in redos.
+            And if something isn&apos;t right at handover, we come back and
+            sort it.
+          </p>
+        </div>
       </div>
     </section>
   );
