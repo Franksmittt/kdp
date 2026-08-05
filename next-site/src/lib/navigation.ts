@@ -14,22 +14,21 @@ export const NAV_LINKS: NavLink[] = [
 ];
 
 export const HEADER_ASSESSMENT_CTA = {
-  label: "Schedule Site Inspection",
+  label: "Get a site visit",
 } as const;
 
 export type FooterTickerVariant = "full" | "compact";
 
 export const FOOTER_TICKER: Record<FooterTickerVariant, string[]> = {
   full: [
-    "Exterior-only painting",
-    "STSMA & PMR 22 programmes",
-    "Phased chunking",
-    "Measured QA & DFT logs",
-    "West Rand estates",
+    "Exterior painting for estates",
+    "Body corporates & complexes",
+    "West Rand specialists",
+    "Roofs, facades & boundary walls",
   ],
   compact: [
-    "Exterior-only painting",
-    "Body corporate & complexes",
+    "Exterior painting for estates",
+    "Body corporates & complexes",
   ],
 };
 
@@ -37,7 +36,7 @@ export const FOOTER_QUICK_LINKS = [
   { label: "Home", href: "/" },
   { label: "Exterior painting", href: "/exterior-painting" },
   { label: "Body corporate", href: "/body-corporate-painters" },
-  { label: "10-Year MRRP", href: "/body-corporate-painters/10-year-maintenance-plan" },
+  { label: "About", href: "/about" },
   { label: "Contact", href: "/contact" },
 ] as const;
 

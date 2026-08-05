@@ -105,8 +105,8 @@ export function SiteFooter({ tickerVariant }: SiteFooterProps) {
                     <div className="footer-panel">
                       <h3>Service area</h3>
                       <p className="footer-area-text">
-                        Krugersdorp, the West Rand, and wider Gauteng. Body corporates,
-                        complexes, commercial facades, and private homes.
+                        Krugersdorp and the West Rand. Exterior painting for estates,
+                        body corporates, and complexes.
                       </p>
                     </div>
                   </div>
