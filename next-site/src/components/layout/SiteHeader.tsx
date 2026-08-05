@@ -11,8 +11,12 @@ export function SiteHeader() {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
 
-  const closeNav = useCallback(() => setNavOpen(false), []);
+  const closeNav = useCallback(() => {
+    setNavOpen(false);
+    setOpenMenu(null);
+  }, []);
 
   useEffect(() => {
     document.body.classList.toggle("kgp-nav-open", navOpen);
@@ -33,6 +37,11 @@ export function SiteHeader() {
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
+  };
+
+  const isGroupActive = (link: (typeof NAV_LINKS)[number]) => {
+    if (isActive(link.href)) return true;
+    return Boolean(link.children?.some((child) => isActive(child.href)));
   };
 
   const headerClass = [
@@ -92,32 +101,88 @@ export function SiteHeader() {
               id="kgp-main-menu"
             >
               <ul className="kgp-nav__links">
-                {NAV_LINKS.map((link) => (
-                  <li
-                    key={link.href}
-                    className={[
-                      link.mobileOnly ? "d-lg-none" : "",
-                      link.desktopHidden ? "d-lg-none" : "",
-                    ]
-                      .filter(Boolean)
-                      .join(" ")}
-                  >
-                    <Link
-                      href={link.href}
-                      className={isActive(link.href) ? "is-active" : undefined}
-                      onClick={closeNav}
-                      aria-current={isActive(link.href) ? "page" : undefined}
+                {NAV_LINKS.map((link) => {
+                  const hasChildren = Boolean(link.children?.length);
+                  const itemOpen = openMenu === link.label;
+                  const active = isGroupActive(link);
+
+                  return (
+                    <li
+                      key={link.href + link.label}
+                      className={[
+                        hasChildren ? "kgp-nav__item--has-menu" : "",
+                        itemOpen ? "is-open" : "",
+                        link.mobileOnly ? "d-lg-none" : "",
+                        link.desktopHidden ? "d-lg-none" : "",
+                      ]
+                        .filter(Boolean)
+                        .join(" ")}
+                      onMouseEnter={() => {
+                        if (hasChildren && window.matchMedia("(min-width: 992px)").matches) {
+                          setOpenMenu(link.label);
+                        }
+                      }}
+                      onMouseLeave={() => {
+                        if (hasChildren && window.matchMedia("(min-width: 992px)").matches) {
+                          setOpenMenu(null);
+                        }
+                      }}
                     >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
+                      {hasChildren ? (
+                        <>
+                          <button
+                            type="button"
+                            className={`kgp-nav__link-btn${active ? " is-active" : ""}`}
+                            aria-expanded={itemOpen}
+                            aria-haspopup="true"
+                            onClick={() =>
+                              setOpenMenu((current) =>
+                                current === link.label ? null : link.label,
+                              )
+                            }
+                          >
+                            {link.label}
+                            <i className="fa-solid fa-chevron-down" aria-hidden="true" />
+                          </button>
+                          <div
+                            className={`kgp-nav__dropdown${itemOpen ? " is-open" : ""}`}
+                            role="menu"
+                          >
+                            {link.children!.map((child) => (
+                              <Link
+                                key={child.href}
+                                href={child.href}
+                                role="menuitem"
+                                className={isActive(child.href) ? "is-active" : undefined}
+                                onClick={closeNav}
+                              >
+                                <span className="kgp-nav__dropdown-label">{child.label}</span>
+                                {child.hint ? (
+                                  <span className="kgp-nav__dropdown-hint">{child.hint}</span>
+                                ) : null}
+                              </Link>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <Link
+                          href={link.href}
+                          className={active ? "is-active" : undefined}
+                          onClick={closeNav}
+                          aria-current={active ? "page" : undefined}
+                        >
+                          {link.label}
+                        </Link>
+                      )}
+                    </li>
+                  );
+                })}
               </ul>
 
               <div className="kgp-nav__actions">
                 <LeadAssessmentTrigger
                   variant="header"
-                  className="kgp-nav__cta kgp-nav__cta--ghost d-none d-lg-inline-flex"
+                  className="kgp-nav__cta kgp-nav__cta--ghost d-none d-xl-inline-flex"
                   onActivate={closeNav}
                 >
                   {HEADER_ASSESSMENT_CTA.label}

@@ -1,91 +1,202 @@
 "use client";
 
-import Link from "next/link";
+import { useEffect, useState } from "react";
 import { SiteImage } from "@/components/ui/SiteImage";
+import { LeadAssessmentTrigger } from "@/components/b2b/LeadAssessmentTrigger";
 import { BUSINESS } from "@/config/site";
 
-const TRUST_ITEMS = [
-  { icon: "fa-solid fa-medal", label: "Quality workmanship" },
-  { icon: "fa-solid fa-shield-halved", label: "Trusted on estates" },
-  { icon: "fa-solid fa-clock", label: "Clear timelines" },
-] as const;
+type HeroVariant = "a" | "b" | "c";
 
-export function HeroHome() {
+const STORAGE_KEY = "kgp-hero-variant";
+
+const HERO_META: Record<
+  HeroVariant,
+  { label: string; name: string; blurb: string }
+> = {
+  a: {
+    label: "A",
+    name: "Cinema",
+    blurb: "Full-bleed estate visual",
+  },
+  b: {
+    label: "B",
+    name: "Split",
+    blurb: "Clean editorial layout",
+  },
+  c: {
+    label: "C",
+    name: "Corporate",
+    blurb: "Dark precision panel",
+  },
+};
+
+function HeroCopy({ onDark = false }: { onDark?: boolean }) {
   return (
-    <section className="kgp-lp-hero" aria-label="Introduction">
-      <div className="container">
-        <div className="kgp-lp-hero__grid">
-          <div className="kgp-lp-hero__visual">
-            <div className="kgp-lp-hero__collage" aria-hidden="true">
-              <div className="kgp-lp-hero__main">
-                <SiteImage
-                  src="/images/project-image-1.jpg"
-                  alt=""
-                  fill
-                  className="kgp-lp-hero__img"
-                  sizes="(max-width: 991px) 90vw, 42vw"
-                  priority
-                />
-              </div>
-              <div className="kgp-lp-hero__float kgp-lp-hero__float--top">
-                <SiteImage
-                  src="/images/project-image-4.jpg"
-                  alt=""
-                  fill
-                  className="kgp-lp-hero__img"
-                  sizes="180px"
-                />
-              </div>
-              <div className="kgp-lp-hero__float kgp-lp-hero__float--bottom">
-                <SiteImage
-                  src="/images/project-image-6.jpg"
-                  alt=""
-                  fill
-                  className="kgp-lp-hero__img"
-                  sizes="200px"
-                />
-              </div>
-              <div className="kgp-lp-hero__badge">
-                <i className="fa-solid fa-paint-roller" aria-hidden="true" />
-                <span>
-                  Exterior
-                  <br />
-                  specialists
-                </span>
-              </div>
-              <div className="kgp-lp-dots kgp-lp-dots--hero" />
-            </div>
-          </div>
+    <>
+      <p className={`kgp-hero__brand${onDark ? " kgp-hero__brand--on-dark" : ""}`}>
+        {BUSINESS.name}
+      </p>
+      <h1 className={`kgp-hero__title${onDark ? " kgp-hero__title--on-dark" : ""}`}>
+        Exterior painting for West Rand estates
+      </h1>
+      <p className={`kgp-hero__lead${onDark ? " kgp-hero__lead--on-dark" : ""}`}>
+        Roofs, facades, and boundary walls for body corporates and complexes —
+        without disturbing residents inside.
+      </p>
+      <div className="kgp-hero__actions">
+        <LeadAssessmentTrigger variant="primary" className="kgp-lp-btn">
+          Request a site visit
+        </LeadAssessmentTrigger>
+        <a
+          href={`tel:${BUSINESS.phone}`}
+          className={`kgp-lp-btn ${onDark ? "kgp-lp-btn--ghost" : "kgp-lp-btn--outline"}`}
+        >
+          Call {BUSINESS.phoneDisplay}
+        </a>
+      </div>
+    </>
+  );
+}
 
-          <div className="kgp-lp-hero__copy">
-            <p className="kgp-lp-hero__brand">{BUSINESS.name}</p>
-            <h1 className="kgp-lp-hero__title">
-              Exterior painting for{" "}
-              <span>estates &amp; complexes</span>
-            </h1>
-            <p className="kgp-lp-hero__lead">
-              We specialise in roofs, facades, and boundary walls on West Rand
-              body corporates and estates — so residents stay undisturbed inside.
+function HeroA() {
+  return (
+    <section className="kgp-hero kgp-hero--a" aria-label="Introduction">
+      <div className="kgp-hero__media" aria-hidden="true">
+        <SiteImage
+          src="/images/hero-bg-image.jpg"
+          alt=""
+          fill
+          className="kgp-hero__media-img"
+          sizes="100vw"
+          priority
+        />
+        <div className="kgp-hero__veil" />
+      </div>
+      <div className="container kgp-hero__content kgp-hero__content--a">
+        <HeroCopy onDark />
+        <ul className="kgp-hero__meta">
+          <li>Estates &amp; complexes</li>
+          <li>West Rand focus</li>
+          <li>Owner-managed</li>
+        </ul>
+      </div>
+    </section>
+  );
+}
+
+function HeroB() {
+  return (
+    <section className="kgp-hero kgp-hero--b" aria-label="Introduction">
+      <div className="kgp-hero__split">
+        <div className="kgp-hero__split-visual" aria-hidden="true">
+          <SiteImage
+            src="/images/project-image-1.jpg"
+            alt=""
+            fill
+            className="kgp-hero__media-img"
+            sizes="(max-width: 991px) 100vw, 52vw"
+            priority
+          />
+        </div>
+        <div className="kgp-hero__split-copy">
+          <div className="kgp-hero__content kgp-hero__content--b">
+            <HeroCopy />
+            <p className="kgp-hero__footnote">
+              Serving Krugersdorp estates including Featherbrooke, Avianto, and
+              surrounding complexes.
             </p>
-
-            <ul className="kgp-lp-hero__trust">
-              {TRUST_ITEMS.map((item) => (
-                <li key={item.label}>
-                  <span className="kgp-lp-hero__trust-icon" aria-hidden="true">
-                    <i className={item.icon} />
-                  </span>
-                  <span>{item.label}</span>
-                </li>
-              ))}
-            </ul>
-
-            <Link href="/about" className="kgp-lp-btn">
-              Learn more about us
-              <i className="fa-solid fa-arrow-right" aria-hidden="true" />
-            </Link>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+function HeroC() {
+  return (
+    <section className="kgp-hero kgp-hero--c" aria-label="Introduction">
+      <div className="container kgp-hero__panel">
+        <div className="kgp-hero__content kgp-hero__content--c">
+          <p className="kgp-hero__kicker">Exterior specialists</p>
+          <HeroCopy onDark />
+          <div className="kgp-hero__stats" aria-label="Focus areas">
+            <div>
+              <strong>Roofs</strong>
+              <span>Coatings built for Highveld weather</span>
+            </div>
+            <div>
+              <strong>Facades</strong>
+              <span>Common-property finishes that last</span>
+            </div>
+            <div>
+              <strong>Walls</strong>
+              <span>Boundary &amp; perimeter programmes</span>
+            </div>
+          </div>
+        </div>
+        <div className="kgp-hero__panel-visual" aria-hidden="true">
+          <SiteImage
+            src="/images/project-image-5.jpg"
+            alt=""
+            fill
+            className="kgp-hero__media-img"
+            sizes="(max-width: 991px) 100vw, 42vw"
+            priority
+          />
+        </div>
+      </div>
+    </section>
+  );
+}
+
+export function HeroHome() {
+  const [variant, setVariant] = useState<HeroVariant>("a");
+  const [ready, setReady] = useState(false);
+
+  useEffect(() => {
+    const saved = window.localStorage.getItem(STORAGE_KEY) as HeroVariant | null;
+    if (saved === "a" || saved === "b" || saved === "c") {
+      setVariant(saved);
+    }
+    setReady(true);
+  }, []);
+
+  const choose = (next: HeroVariant) => {
+    setVariant(next);
+    window.localStorage.setItem(STORAGE_KEY, next);
+  };
+
+  return (
+    <>
+      {variant === "a" ? <HeroA /> : null}
+      {variant === "b" ? <HeroB /> : null}
+      {variant === "c" ? <HeroC /> : null}
+
+      <div
+        className={`kgp-hero-picker${ready ? " is-ready" : ""}`}
+        role="group"
+        aria-label="Choose hero layout"
+      >
+        <p className="kgp-hero-picker__title">Hero</p>
+        {(Object.keys(HERO_META) as HeroVariant[]).map((key) => {
+          const meta = HERO_META[key];
+          return (
+            <button
+              key={key}
+              type="button"
+              className={`kgp-hero-picker__btn${variant === key ? " is-active" : ""}`}
+              onClick={() => choose(key)}
+              aria-pressed={variant === key}
+            >
+              <span className="kgp-hero-picker__letter">{meta.label}</span>
+              <span className="kgp-hero-picker__copy">
+                <strong>{meta.name}</strong>
+                <small>{meta.blurb}</small>
+              </span>
+            </button>
+          );
+        })}
+      </div>
+    </>
   );
 }

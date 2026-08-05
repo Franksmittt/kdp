@@ -7,13 +7,13 @@ const TESTIMONIALS = [
   },
   {
     quote:
-      "Clear exterior scope, tidy site daily, and the boundary walls look sharp. Easy to work with as managing agent.",
+      "Clear exterior scope, tidy site daily, and the boundary walls look sharp.",
     name: "David Mokoena",
     place: "Managing agent, Krugersdorp",
   },
   {
     quote:
-      "Roof and facade work done properly. They stuck to estate hours and left the common areas clean every day.",
+      "Roof and facade work done properly. They stuck to estate hours and left common areas clean.",
     name: "Sarah Ndlovu",
     place: "Estate committee, Featherbrooke",
   },
@@ -26,34 +26,21 @@ export function HomeTestimonialsSection() {
       aria-labelledby="home-testimonials-heading"
     >
       <div className="container">
-        <header className="kgp-lp-section-head">
-          <p className="kgp-lp-eyebrow">What our clients say</p>
-          <h2 id="home-testimonials-heading">
-            Trusted by estates{" "}
-            <span>across the West Rand</span>
-          </h2>
+        <header className="kgp-lp-section-head kgp-lp-section-head--left">
+          <p className="kgp-lp-eyebrow">Clients</p>
+          <h2 id="home-testimonials-heading">Trusted on the West Rand</h2>
         </header>
 
-        <ul className="kgp-lp-testimonials__grid">
+        <ul className="kgp-lp-testimonials__list">
           {TESTIMONIALS.map((item) => (
-            <li key={item.name} className="kgp-lp-quote-card">
-              <span className="kgp-lp-quote-card__mark" aria-hidden="true">
-                “
-              </span>
-              <div
-                className="kgp-lp-quote-card__stars"
-                aria-label="5 out of 5 stars"
-              >
-                {Array.from({ length: 5 }).map((_, i) => (
-                  <i key={i} className="fa-solid fa-star" aria-hidden="true" />
-                ))}
-              </div>
-              <p className="kgp-lp-quote-card__text">{item.quote}</p>
-              <p className="kgp-lp-quote-card__name">{item.name}</p>
-              <p className="kgp-lp-quote-card__place">{item.place}</p>
-              <span className="kgp-lp-quote-card__ghost" aria-hidden="true">
-                ”
-              </span>
+            <li key={item.name}>
+              <blockquote>
+                <p>{item.quote}</p>
+                <footer>
+                  <cite>{item.name}</cite>
+                  <span>{item.place}</span>
+                </footer>
+              </blockquote>
             </li>
           ))}
         </ul>

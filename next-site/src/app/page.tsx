@@ -46,13 +46,10 @@ export default function Home() {
       <section className="kgp-lp-cta" aria-labelledby="home-cta-heading">
         <div className="container kgp-lp-cta__inner">
           <div>
-            <p className="kgp-lp-eyebrow kgp-lp-eyebrow--on-dark">Next step</p>
-            <h2 id="home-cta-heading">
-              Ready for a site visit on your estate or complex?
-            </h2>
+            <h2 id="home-cta-heading">Ready for a site visit?</h2>
             <p>
-              Call or WhatsApp Rico. We&apos;ll walk the site and send a clear
-              exterior scope.
+              Call or WhatsApp Rico for a clear exterior scope on your estate or
+              complex.
             </p>
           </div>
           <div className="kgp-lp-cta__actions">
@@ -60,10 +57,10 @@ export default function Home() {
               Request a site visit
             </LeadAssessmentTrigger>
             <a href={`tel:${BUSINESS.phone}`} className="kgp-lp-btn kgp-lp-btn--ghost">
-              Call {BUSINESS.phoneDisplay}
+              {BUSINESS.phoneDisplay}
             </a>
             <Link href="/contact" className="kgp-lp-btn kgp-lp-btn--ghost">
-              Contact form
+              Contact
             </Link>
           </div>
         </div>
