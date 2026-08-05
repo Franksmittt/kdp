@@ -231,12 +231,12 @@ header.main-header.kgp-nav .kgp-nav__bar {
 
 .kgp-nav--a .kgp-nav__links a:hover,
 .kgp-nav--a .kgp-nav__links a:focus-visible {
-  color: #fff;
+  color: #fff !important;
   background: rgba(255, 255, 255, 0.08);
 }
 
 .kgp-nav--a .kgp-nav__links a.is-active {
-  color: #fff;
+  color: #fff !important;
   background: rgba(37, 99, 235, 0.35);
 }
 
@@ -293,12 +293,12 @@ header.main-header.kgp-nav .kgp-nav__bar {
 
 .kgp-nav--b .kgp-nav__links a:hover,
 .kgp-nav--b .kgp-nav__links a:focus-visible {
-  color: #0f172a;
+  color: #0f172a !important;
   background: #f1f5f9;
 }
 
 .kgp-nav--b .kgp-nav__links a.is-active {
-  color: var(--kgp-action-primary);
+  color: var(--kgp-action-primary) !important;
   background: #eff6ff;
 }
 
@@ -406,13 +406,13 @@ header.main-header.kgp-nav .kgp-nav__bar {
 
 .kgp-nav--c .kgp-nav__links a:hover,
 .kgp-nav--c .kgp-nav__links a:focus-visible {
-  color: #0f172a;
+  color: #0f172a !important;
   background: transparent;
   border-bottom-color: #93c5fd;
 }
 
 .kgp-nav--c .kgp-nav__links a.is-active {
-  color: var(--kgp-action-primary);
+  color: var(--kgp-action-primary) !important;
   background: transparent;
   border-bottom-color: var(--kgp-action-primary);
 }
