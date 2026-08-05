@@ -13,7 +13,6 @@ export function SiteHeader() {
   const [navOpen, setNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
 
-  const isHome = pathname === "/";
   const closeNav = useCallback(() => setNavOpen(false), []);
 
   useEffect(() => {
@@ -43,9 +42,9 @@ export function SiteHeader() {
   const headerClass = [
     "main-header",
     "kgp-header",
+    "kgp-header--inner",
     navOpen ? "kgp-header--open" : "",
     scrolled ? "kgp-header--scrolled" : "kgp-header--top",
-    isHome ? "kgp-header--home" : "kgp-header--inner",
   ]
     .filter(Boolean)
     .join(" ");
