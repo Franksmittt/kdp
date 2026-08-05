@@ -1,14 +1,31 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { HEADER_ASSESSMENT_CTA, NAV_LINKS } from "@/lib/navigation";
 import { LeadAssessmentTrigger } from "@/components/b2b/LeadAssessmentTrigger";
+import { BUSINESS } from "@/config/site";
 
-const SCROLL_SOLID_THRESHOLD = 48;
+export type HeaderVariant = "a" | "b" | "c";
 
-export function SiteHeader() {
+const STORAGE_KEY = "kgp-header-variant";
+const VARIANTS: HeaderVariant[] = ["a", "b", "c"];
+
+function readStoredVariant(): HeaderVariant {
+  if (typeof window === "undefined") return "b";
+  const stored = window.localStorage.getItem(STORAGE_KEY);
+  if (stored === "a" || stored === "b" || stored === "c") return stored;
+  return "b";
+}
+
+function HeaderChrome({
+  variant,
+  onVariantChange,
+}: {
+  variant: HeaderVariant;
+  onVariantChange: (next: HeaderVariant) => void;
+}) {
   const pathname = usePathname();
   const [navOpen, setNavOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -25,10 +42,7 @@ export function SiteHeader() {
   }, [pathname, closeNav]);
 
   useEffect(() => {
-    const onScroll = () => {
-      setScrolled(window.scrollY >= SCROLL_SOLID_THRESHOLD);
-    };
-
+    const onScroll = () => setScrolled(window.scrollY >= 24);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -41,34 +55,57 @@ export function SiteHeader() {
 
   const headerClass = [
     "main-header",
-    "kgp-header",
-    "kgp-header--inner",
-    navOpen ? "kgp-header--open" : "",
-    scrolled ? "kgp-header--scrolled" : "kgp-header--top",
+    "kgp-nav",
+    `kgp-nav--${variant}`,
+    navOpen ? "kgp-nav--open" : "",
+    scrolled ? "kgp-nav--scrolled" : "",
   ]
     .filter(Boolean)
     .join(" ");
 
   return (
-    <header className={headerClass}>
-      <div className="header-sticky">
-        <nav className="navbar navbar-expand-lg" aria-label="Main navigation">
-          <div className="container kgp-header__container">
-            <Link className="navbar-brand text-logo" href="/" onClick={closeNav}>
-              Krugersdorp Painters
-            </Link>
+    <>
+      <header className={headerClass}>
+        {variant === "c" && (
+          <div className="kgp-nav__utility">
+            <div className="container kgp-nav__utility-inner">
+              <p className="kgp-nav__utility-text">
+                Exterior painting for West Rand estates &amp; complexes
+              </p>
+              <div className="kgp-nav__utility-links">
+                <a href={`tel:${BUSINESS.phone}`}>
+                  <i className="fa-solid fa-phone" aria-hidden="true" />
+                  {BUSINESS.phoneDisplay}
+                </a>
+                <a
+                  href={BUSINESS.whatsapp}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  <i className="fa-brands fa-whatsapp" aria-hidden="true" />
+                  WhatsApp
+                </a>
+              </div>
+            </div>
+          </div>
+        )}
 
-            <div
-              className={`navbar-collapse main-menu kgp-nav-panel${navOpen ? " show" : ""}`}
-              id="kgp-main-menu"
-            >
-              <div className="nav-menu-wrapper">
-                <ul className="navbar-nav mr-auto" id="menu">
+        <div className="kgp-nav__bar">
+          <nav className="navbar navbar-expand-lg" aria-label="Main navigation">
+            <div className="container kgp-nav__container">
+              <Link className="kgp-nav__brand" href="/" onClick={closeNav}>
+                {BUSINESS.name}
+              </Link>
+
+              <div
+                className={`kgp-nav__panel${navOpen ? " is-open" : ""}`}
+                id="kgp-main-menu"
+              >
+                <ul className="kgp-nav__links">
                   {NAV_LINKS.map((link) => (
                     <li
                       key={link.href}
                       className={[
-                        "nav-item",
                         link.mobileOnly ? "d-lg-none" : "",
                         link.desktopHidden ? "d-lg-none" : "",
                       ]
@@ -76,8 +113,8 @@ export function SiteHeader() {
                         .join(" ")}
                     >
                       <Link
-                        className={`nav-link${isActive(link.href) ? " active" : ""}`}
                         href={link.href}
+                        className={isActive(link.href) ? "is-active" : undefined}
                         onClick={closeNav}
                         aria-current={isActive(link.href) ? "page" : undefined}
                       >
@@ -86,55 +123,112 @@ export function SiteHeader() {
                     </li>
                   ))}
                 </ul>
+
+                <div className="kgp-nav__actions">
+                  <LeadAssessmentTrigger
+                    variant="header"
+                    className="kgp-nav__cta kgp-nav__cta--ghost d-none d-lg-inline-flex"
+                    onActivate={closeNav}
+                  >
+                    {HEADER_ASSESSMENT_CTA.label}
+                  </LeadAssessmentTrigger>
+                  <Link
+                    href="/contact"
+                    className="kgp-nav__cta kgp-nav__cta--solid"
+                    onClick={closeNav}
+                  >
+                    Contact Us
+                  </Link>
+                </div>
+
+                <div className="kgp-nav__mobile-actions d-lg-none">
+                  <LeadAssessmentTrigger
+                    variant="header"
+                    className="kgp-nav__cta kgp-nav__cta--ghost"
+                    onActivate={closeNav}
+                  >
+                    {HEADER_ASSESSMENT_CTA.label}
+                  </LeadAssessmentTrigger>
+                  <Link
+                    href="/contact"
+                    className="kgp-nav__cta kgp-nav__cta--solid"
+                    onClick={closeNav}
+                  >
+                    Contact Us
+                  </Link>
+                </div>
               </div>
 
-              <div className="header-btn kgp-header__actions">
-                <LeadAssessmentTrigger
-                  variant="header"
-                  className="kgp-header__cta-secondary d-none d-lg-inline-flex"
-                  onActivate={closeNav}
-                >
-                  {HEADER_ASSESSMENT_CTA.label}
-                </LeadAssessmentTrigger>
-                <Link
-                  href="/contact"
-                  className="btn-default btn-highlighted kgp-header__cta-primary"
-                  onClick={closeNav}
-                >
-                  <i className="fa-solid fa-envelope btn-contact-icon" aria-hidden="true" />
-                  Contact Us
-                </Link>
-              </div>
-
-              <div className="kgp-header__mobile-ctas d-lg-none">
-                <LeadAssessmentTrigger
-                  variant="header"
-                  className="kgp-header__cta-secondary"
-                  onActivate={closeNav}
-                >
-                  {HEADER_ASSESSMENT_CTA.label}
-                </LeadAssessmentTrigger>
-                <Link
-                  href="/contact"
-                  className="btn-default btn-highlighted kgp-header__cta-primary"
-                  onClick={closeNav}
-                >
-                  Contact Us
-                </Link>
-              </div>
+              <button
+                type="button"
+                className="kgp-nav__toggle"
+                aria-expanded={navOpen}
+                aria-controls="kgp-main-menu"
+                aria-label={navOpen ? "Close menu" : "Open menu"}
+                onClick={() => setNavOpen((o) => !o)}
+              >
+                <span />
+                <span />
+                <span />
+              </button>
             </div>
+          </nav>
+        </div>
+      </header>
 
+      <div className="kgp-nav-picker" role="region" aria-label="Header design picker">
+        <p>Header style</p>
+        <div className="kgp-nav-picker__btns">
+          {VARIANTS.map((item) => (
             <button
+              key={item}
               type="button"
-              className="navbar-toggle"
-              aria-expanded={navOpen}
-              aria-controls="kgp-main-menu"
-              aria-label={navOpen ? "Close menu" : "Open menu"}
-              onClick={() => setNavOpen((o) => !o)}
-            />
-          </div>
-        </nav>
+              className={variant === item ? "is-active" : undefined}
+              onClick={() => onVariantChange(item)}
+            >
+              {item.toUpperCase()}
+            </button>
+          ))}
+        </div>
       </div>
-    </header>
+    </>
+  );
+}
+
+function HeaderWithParams() {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+  const [variant, setVariant] = useState<HeaderVariant>("b");
+
+  useEffect(() => {
+    const fromQuery = searchParams.get("header");
+    if (fromQuery === "a" || fromQuery === "b" || fromQuery === "c") {
+      setVariant(fromQuery);
+      window.localStorage.setItem(STORAGE_KEY, fromQuery);
+      return;
+    }
+    setVariant(readStoredVariant());
+  }, [searchParams]);
+
+  const onVariantChange = useCallback(
+    (next: HeaderVariant) => {
+      setVariant(next);
+      window.localStorage.setItem(STORAGE_KEY, next);
+      const params = new URLSearchParams(searchParams.toString());
+      params.set("header", next);
+      router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    },
+    [pathname, router, searchParams],
+  );
+
+  return <HeaderChrome variant={variant} onVariantChange={onVariantChange} />;
+}
+
+export function SiteHeader() {
+  return (
+    <Suspense fallback={<HeaderChrome variant="b" onVariantChange={() => undefined} />}>
+      <HeaderWithParams />
+    </Suspense>
   );
 }
