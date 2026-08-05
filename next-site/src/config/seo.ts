@@ -116,16 +116,16 @@ type PageSeo = {
 
 const PAGES: Record<PageSlug, PageSeo> = {
   home: {
-    title: "Exterior Painters Krugersdorp | Body Corporate & Estate Specialists",
+    title: "Exterior Painters Krugersdorp | Estates & Complexes",
     description:
-      "Exterior-only painting for West Rand estates and body corporates. STSMA-aware phased programmes, measured material QA — zero interior disruption. Krugersdorp, Featherbrooke, Avianto, Chancliff.",
+      "Krugersdorp Painters specialises in exterior painting for West Rand estates and body corporates — roofs, facades, and boundary walls. Clear scopes. No interior work.",
     keywords: [
       "exterior painters Krugersdorp",
       "body corporate painting West Rand",
       "complex painting contractors",
-      "sectional title repainting",
-      "estate boundary wall painters",
-      "PMR 22 maintenance painting",
+      "sectional title exterior painting",
+      "estate painting Krugersdorp",
+      "boundary wall painters West Rand",
     ],
   },
   about: {

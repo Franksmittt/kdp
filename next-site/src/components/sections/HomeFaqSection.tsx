@@ -4,28 +4,16 @@ import { LeadAssessmentTrigger } from "@/components/b2b/LeadAssessmentTrigger";
 import { homeFaqs } from "@/content/site-content";
 import { BUSINESS } from "@/config/site";
 
-const quickLinks = [
-  {
-    label: "Schedule site inspection",
-    action: "assessment" as const,
-    icon: "fa-solid fa-clipboard-check",
-  },
-  { label: "Material QA log", href: "/#qa-log", icon: "fa-solid fa-ruler-combined" },
-  { label: "Body corporate guide", href: "/body-corporate-painters", icon: "fa-solid fa-building" },
-] as const;
-
 export function HomeFaqSection() {
   return (
     <section className="kgp-faq-section kgp-site-section" aria-labelledby="home-faq-heading">
       <div className="container">
         <header className="kgp-faq-section__header">
-          <p className="kgp-faq-section__eyebrow">Trustee &amp; managing agent FAQ</p>
           <h2 id="home-faq-heading" className="kgp-faq-section__title">
-            Straight answers on exterior programmes, phasing, and pricing
+            Common questions
           </h2>
           <p className="kgp-faq-section__intro">
-            Planning a body-corporate repaint or HOA exterior cycle on the West Rand? These are
-            the questions trustees and managing agents ask before issuing an RFP.
+            Straight answers for trustees, managing agents, and estate managers.
           </p>
         </header>
 
@@ -45,8 +33,8 @@ export function HomeFaqSection() {
                 <div className="kgp-faq-aside__icon" aria-hidden="true">
                   <i className="fa-solid fa-phone" />
                 </div>
-                <h3>Speak to Rico directly</h3>
-                <p>Owner-managed from site walk-through to handover — no call centre.</p>
+                <h3>Speak to Rico</h3>
+                <p>Owner-managed from first site visit to handover.</p>
                 <div className="kgp-faq-aside__actions">
                   <a href={`tel:${BUSINESS.phone}`} className="btn-default btn-highlighted">
                     Call {BUSINESS.phoneDisplay}
@@ -64,28 +52,31 @@ export function HomeFaqSection() {
               </div>
 
               <div className="kgp-faq-aside__card">
-                <h3>Popular next steps</h3>
+                <h3>Next step</h3>
                 <ul className="kgp-faq-aside__links">
-                  {quickLinks.map((link) => (
-                    <li key={link.label}>
-                      {"href" in link ? (
-                        <Link href={link.href}>
-                          <i className={link.icon} aria-hidden="true" />
-                          {link.label}
-                        </Link>
-                      ) : (
-                        <LeadAssessmentTrigger variant="unstyled">
-                          <i className={link.icon} aria-hidden="true" />
-                          {link.label}
-                        </LeadAssessmentTrigger>
-                      )}
-                    </li>
-                  ))}
+                  <li>
+                    <LeadAssessmentTrigger variant="unstyled">
+                      <i className="fa-solid fa-clipboard-check" aria-hidden="true" />
+                      Request a site visit
+                    </LeadAssessmentTrigger>
+                  </li>
+                  <li>
+                    <Link href="/body-corporate-painters">
+                      <i className="fa-solid fa-building" aria-hidden="true" />
+                      Body corporate painting
+                    </Link>
+                  </li>
+                  <li>
+                    <Link href="/exterior-painting">
+                      <i className="fa-solid fa-paint-roller" aria-hidden="true" />
+                      Exterior services
+                    </Link>
+                  </li>
                 </ul>
               </div>
 
               <Link href="/faqs" className="kgp-faq-aside__all">
-                View full FAQ library
+                More FAQs
                 <i className="fa-solid fa-arrow-right" aria-hidden="true" />
               </Link>
             </div>

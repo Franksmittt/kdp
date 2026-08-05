@@ -493,33 +493,27 @@ export const testimonialsGrid: Testimonial[] = [
 export const homeFaqs: FaqItem[] = [
   {
     id: "hf1",
-    question: "Do you paint interiors as well as exteriors?",
+    question: "Do you paint interiors?",
     answer:
-      "No — we are exterior-only by design. That means zero interior access, no resident disruption inside units, and teams sized for roofs, facades, boundary walls, and common-area exteriors. Trustees and HOAs get phased programmes without painters moving through hallways and lifts.",
+      "No. We specialise in exterior painting for estates and complexes — roofs, facades, and boundary walls. That keeps residents undisturbed inside their units.",
   },
   {
     id: "hf2",
     question: "Can you work with our body corporate or managing agent?",
     answer:
-      "Yes. We lead with on-site operational proof — SANS 10400 moisture diagnostics below 8%, measured 100 µm DFT coatings, and polymer-modified tanking where lateral damp exists. Scopes align to STSMA PMR 22 reserve planning and phase block-by-block with zero interior access. Quotes are structured for trustee meetings — not retail one-liners.",
+      "Yes. We quote and phase common-property exteriors so trustees and managing agents can plan work clearly and present scopes at meetings.",
   },
   {
     id: "hf3",
-    question: "How do you price an estate exterior programme?",
+    question: "How do you quote a complex or estate?",
     answer:
-      "We walk the scheme, measure substrates, note damp and height access, and map a phased chunking timeline. Prep, primers, tanking, and topcoats are itemised so managing agents can defend reserve fund drawdowns at the AGM.",
+      "We visit the site, check the surfaces that need prep and paint, and send a written exterior scope. Larger schemes can be phased block by block if that suits your budget cycle.",
   },
   {
     id: "hf4",
-    question: "What QA do you document on site?",
+    question: "Can residents stay on site while you paint?",
     answer:
-      "Moisture readings against SANS thresholds, tanking protocols, dry film thickness (DFT) checks, and photographic stage sign-off. Your PMR 22 file gets numbers — not vague “quality workmanship” claims.",
-  },
-  {
-    id: "hf5",
-    question: "Can residents stay on site during exterior work?",
-    answer:
-      "Usually yes. Phasing keeps one zone active at a time, with daily boundary tape, dust control on ground works, and agreed contractor hours per estate rules. We coordinate with security and the managing agent before mobilisation.",
+      "Usually yes. Exterior work stays outside. We agree working hours with estate or complex rules and keep active zones clear and tidy.",
   },
 ];
 
@@ -683,14 +677,14 @@ export const serviceSingleContent: ServiceSingleContentData = {
 };
 
 export const ctaBox = {
-  eyebrow: "Contact us today",
-  title: "Book a repaint, exterior refresh, or body-corporate maintenance cycle",
+  eyebrow: "Talk to us",
+  title: "Need exterior painting for your estate or complex?",
   description:
-    "Send photos or invite us over for measurements. We quote labour, materials, access, and prep separately where it helps you compare apples with apples, from a single room to a full scheme.",
+    "Call or WhatsApp Rico. Tell us about the scheme, and we’ll arrange a site visit for a clear exterior quote.",
   image: "/images/cta-box-image.jpg",
   items: [
-    { icon: "fa-solid fa-comments", title: "Quick response & clear scope" },
-    { icon: "fa-solid fa-clipboard-check", title: "Experienced painting contractor" },
+    { icon: "fa-solid fa-building", title: "Estates & body corporates" },
+    { icon: "fa-solid fa-paint-roller", title: "Exterior-only specialists" },
   ],
 };
 

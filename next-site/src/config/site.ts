@@ -37,7 +37,7 @@ export const BUSINESS = {
   phone: "+27764719933",
   phoneDisplay: "076 471 9933",
   email: "info@krugersdorppainting.co.za",
-  slogan: "Exterior-only painting for West Rand estates & body corporates",
+  slogan: "Exterior painting for West Rand estates & complexes",
   areaServed: [
     "Krugersdorp",
     "West Rand",
