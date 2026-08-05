@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { DM_Sans, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import { SiteFooter } from "@/components/layout/SiteFooter";
+import { StickyContactBar } from "@/components/layout/StickyContactBar";
 import { LeadAssessmentShell } from "@/components/b2b/LeadAssessmentShell";
 import { BUSINESS, SITE_URL } from "@/config/site";
 
@@ -96,6 +97,7 @@ export default function RootLayout({
             {children}
           </main>
           <SiteFooter />
+          <StickyContactBar />
           <a
             href={BUSINESS.whatsapp}
             className="whatsapp-float"

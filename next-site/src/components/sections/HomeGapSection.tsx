@@ -1,15 +1,15 @@
 const PAIRS = [
   {
     pain: "Peeling & fading",
-    fix: "Prep-first repaints with coatings chosen for Highveld sun and rain.",
+    fix: "Prep-first repaints with coatings chosen for Highveld sun and rain — not a slap of topcoat over failed substrate.",
   },
   {
     pain: "Resident complaints",
-    fix: "Phased sections, agreed working hours, notices, and tidy sites daily.",
+    fix: "Phased sections, agreed working hours, notices, and tidy sites daily. General painters often skip this.",
   },
   {
     pain: "Budget pressure",
-    fix: "Block-by-block phasing and itemised scopes that fit levy planning.",
+    fix: "Block-by-block phasing and itemised scopes that fit levy planning — so trustees aren't forced into a special levy shock.",
   },
 ] as const;
 

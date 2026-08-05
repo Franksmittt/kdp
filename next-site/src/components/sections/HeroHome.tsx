@@ -31,6 +31,10 @@ export function HeroHome() {
           <LeadAssessmentTrigger variant="primary" className="kgp-lp-btn">
             Request a site visit
           </LeadAssessmentTrigger>
+          <a href={`tel:${BUSINESS.phone}`} className="kgp-lp-btn kgp-lp-btn--ghost">
+            <i className="fa-solid fa-phone" aria-hidden="true" />
+            Call {BUSINESS.phoneDisplay}
+          </a>
           <a
             href={BUSINESS.whatsapp}
             target="_blank"
@@ -38,14 +42,18 @@ export function HeroHome() {
             className="kgp-lp-btn kgp-lp-btn--ghost"
           >
             <i className="fa-brands fa-whatsapp" aria-hidden="true" />
-            WhatsApp Rico
+            WhatsApp
           </a>
         </div>
         <ul className="kgp-hero__meta">
           <li>Same-day response</li>
           <li>Exterior only — no interiors</li>
-          <li>Owner-managed</li>
+          <li>Owner-managed by Rico</li>
         </ul>
+        <p className="kgp-hero__proof">
+          Built for schemes like Featherbrooke, Avianto, Chancliff Ridge, Homes
+          Haven, and Noordheuwel.
+        </p>
       </div>
     </section>
   );
