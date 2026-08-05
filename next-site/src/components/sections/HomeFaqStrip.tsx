@@ -12,17 +12,14 @@ export function HomeFaqStrip({ items }: { items: HomeFaqItem[] }) {
           <h2 id="home-faq-heading">Before you ask</h2>
         </header>
 
-        <div className="kgp-lp-faq__list">
-          {items.map((item, index) => (
-            <details key={item.question} open={index === 0}>
-              <summary>
-                {item.question}
-                <i className="fa-solid fa-chevron-down" aria-hidden="true" />
-              </summary>
+        <ul className="kgp-lp-faq__grid">
+          {items.map((item) => (
+            <li key={item.question}>
+              <h3>{item.question}</h3>
               <p>{item.answer}</p>
-            </details>
+            </li>
           ))}
-        </div>
+        </ul>
       </div>
     </section>
   );
